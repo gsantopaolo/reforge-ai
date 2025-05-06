@@ -36,3 +36,4 @@ server.txt
 
 test/train_dataset_*.json
 test/MNIST
+/src/assessment_crew/temp_codebase
