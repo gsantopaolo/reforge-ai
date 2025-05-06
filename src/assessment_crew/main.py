@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import json
 
-from crew import AssessmentCrew
+from assessment_crew import AssessmentCrew
 
 def prepare_codebase(target: str) -> str:
     """
@@ -53,6 +53,12 @@ if __name__ == "__main__":
 
     target = sys.argv[1]
     codebase_path = prepare_codebase(target)
+
+    # normalize to absolute, so downstream tools never see a stale relative path
+    codebase_path = os.path.abspath(codebase_path)
+
+    # tell JDepsTool where to look at runtime:
+    os.environ["CODE_PATH"] = codebase_path
 
     # Ensure output directories exist
     os.makedirs("1-assessment/docs", exist_ok=True)

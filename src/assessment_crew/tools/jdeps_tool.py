@@ -1,76 +1,111 @@
+# src/assessment_crew/tools/jdeps_tool.py
+
 import os
+import sys
 import subprocess
-from typing import Type
+from pathlib import Path
+from typing import Optional, Type, List
 
 from pydantic import BaseModel, Field, PrivateAttr
 from crewai.tools.base_tool import BaseTool
 
+BUILD_OUTPUT_CANDIDATES = [
+    "build/classes/java/main",  # Gradle default
+    "target/classes",           # Maven default
+]
+
+import logging
+logging.basicConfig(level=logging.INFO)  # or DEBUG
+logger = logging.getLogger(__name__)
+
+
+def resolve_target_path(base_path: Optional[str] = None) -> str:
+    """
+    Resolve where to point jdeps:
+      1) If base_path is a .jar → use it.
+      2) Otherwise, if any of the standard build output dirs exist under the root → use the first one found.
+      3) Otherwise, if there are any .class files anywhere under the root → use the root itself.
+      4) If still nothing, error.
+    """
+    # Determine project root (explicit, CODE_PATH, or cwd)
+    root = Path(base_path or os.getenv("CODE_PATH") or os.getcwd())
+
+    # 1) Direct JAR?
+    if root.is_file() and root.suffix.lower() == ".jar":
+        return str(root)
+
+    # Must be a directory from here on
+    if not root.is_dir():
+        raise RuntimeError(f"'{root}' is not a directory or JAR.")
+
+    # 2) Look for standard build output dirs first
+    for candidate in BUILD_OUTPUT_CANDIDATES:
+        for path in root.rglob(candidate):
+            if path.is_dir():
+                return str(path)
+
+    # 3) Fallback: if any .class files exist under root, use root itself
+    if any(root.rglob("*.class")):
+        return str(root)
+
+    # 4) Give up
+    raise RuntimeError(
+        f"Could not locate any of {BUILD_OUTPUT_CANDIDATES} under {root}. "
+        "Did you compile your code? Please build first or point --base-path at the class output."
+    )
+
+
+
+
 
 class JDepsInput(BaseModel):
-    """
-    Input arguments for JDepsTool.
-    """
-    target_path: str = Field(
-        ...,
+    base_path: Optional[str] = Field(
+        None,
         description="Filesystem path to compiled class files or JAR"
-    )
-    jdk_internals: bool = Field(
-        True,
-        description="Whether to include JDK internal API usage in the analysis"
-    )
-    recursive: bool = Field(
-        True,
-        description="Whether to recurse into subpackages (the -R flag)"
     )
 
 
 class JDepsTool(BaseTool):
-    """
-    Wrapper for the `jdeps` CLI to analyze Java dependencies and internal APIs.
-    """
     name: str = "jdeps"
-    description: str = "Analyze Java dependencies and JDK internal API usage via the jdeps CLI"
+    description: str = "Analyze Java dependencies via jdeps"
     args_schema: Type[JDepsInput] = JDepsInput
 
-    # Declare the executable path as a private attribute
     _jdeps_cmd: str = PrivateAttr()
 
-    def __init__(self, java_home: str = None):
-        super().__init__()  # initialize BaseTool/BaseModel internals
-        if java_home:
-            self._jdeps_cmd = os.path.join(java_home, "bin", "jdeps")
-        else:
-            self._jdeps_cmd = "jdeps"
+    def __init__(self, java_home: Optional[str] = None):
+        super().__init__()
+        self._jdeps_cmd = os.path.join(java_home, "bin", "jdeps") if java_home else "jdeps"
 
-    def _run(self, target_path: str, jdk_internals: bool, recursive: bool) -> dict:
-        """
-        Execute jdeps with the specified flags and return parsed results.
-        """
-        cmd = [self._jdeps_cmd]
-        if jdk_internals:
-            cmd.append("--jdk-internals")
-        if recursive:
-            cmd.append("-R")
-        cmd.extend(["-s", target_path])
 
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"jdeps failed (exit {e.returncode}): {e.stderr.strip()}")
+    def _run(self, *, base_path: Optional[str]) -> dict:
+        # pick the real path (JAR or class dir)
+        # target = resolve_target_path(base_path)
+        target = resolve_target_path("/Users/gp/Developer/java-samples/reforge-ai/src/assessment_crew/temp_codebase/")
+        # logger.info(f"************ Running jdeps on {target}")
+        # sys.__stdout__.write(f"{target}\n")
+        # sys.__stdout__.flush()
+
+        # build jdeps invocation (no -s so we get full detail)
+        cmd: List[str] = [self._jdeps_cmd]
+        # if jdk_internals:
+        #     cmd.append("--jdk-internals")
+        # recursive
+        cmd.append("-R")
+
+        cmd.append(target)
+
+        # run & collect
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"jdeps failed (exit {result.returncode}): {result.stderr.strip()}")
 
         output = result.stdout
         issues = [
             line.strip()
             for line in output.splitlines()
-            if "JDK internal API" in line or line.startswith("jdeps:")
+            if "not found" in line
+               or "JDK internal API" in line
+               or line.startswith("jdeps:")
         ]
 
-        return {
-            "jdeps_output": output,
-            "identified_issues": issues
-        }
+        return {"jdeps_output": output, "identified_issues": issues}
