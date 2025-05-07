@@ -1,0 +1,138 @@
+extract_file_metadata:
+  description: >
+    Open and parse each Java source file to extract metadata:
+    package declarations, class/interface names, and module affiliations.  
+    Build a file‐level index for downstream analysis.
+  expected_output: >
+    - File index MD (tree format): file path, package, classes, interfaces  
+    - Summary of total counts and any parsing errors
+  agent: codebase_analyst_agent
+
+generate_system_architecture:
+  description: >
+    Create high-level system architecture diagrams in Mermaid (architecture-beta),
+    showing module hierarchies, package groupings, and component interactions.
+  expected_output: >
+    - Mermaid architecture diagrams  
+    - Narrative describing core components and interactions
+  agent: documentation_agent
+
+generate_module_docs:
+  description: >
+    For each prioritized module:
+    - Enhance/auto-generate Javadoc  
+    - Write high-level overviews  
+    - Produce Mermaid class and sequence diagrams  
+    - Document namespaces, packages, and technologies used
+  expected_output: >
+    - Module documentation set (Javadoc, Markdown)  
+    - Mermaid diagrams for classes and flows  
+    - Component & technology inventory spreadsheet
+  agent: documentation_agent
+
+component_technology_inventory:
+  description: >
+    Enumerate all components, libraries, frameworks, and runtimes.
+    Research migration pathways to Spring Boot on Java 21 for each via web sources.
+  expected_output: >
+    - Technology Inventory document with:  
+      • Current version & usage context  
+      • Migration notes & best-practice references
+  agent: codebase_analyst_agent
+
+research_migration_best_practices:
+  description: >
+    Summarize web-sourced best practices for migrating:
+    - Java EE / Red Hat JBoss EAP → Spring Boot on Java 21  
+    - Legacy frameworks to modern equivalents (e.g., logging, persistence)
+  expected_output: >
+    - Migration Practices Report covering patterns (Strangler Fig, branch-by-abstraction)  
+    - Tool recommendations (OpenRewrite, jdeps, Flyway/Liquibase)  
+    - Case-study references
+  agent: domain_expert_agent
+
+impact_analysis_on_java21:
+  description: >
+    Map legacy namespaces, packages, and classes to Java 21 and Spring Boot equivalents;
+    identify removed or changed constructs and assess migration risks.
+  expected_output: >
+    - Impact Analysis document with:  
+      • Legacy → Java 21 mapping  
+      • Legacy → Spring Boot
+      • Risk register with severity levels  
+      • Recommended migration patterns per component
+  agent: migration_agent
+
+plan_phased_module_extraction:
+  description: >
+    Identify the least-coupled module via coupling metrics;
+    create a stepwise extraction plan to implement it in Java 21 and Spring Boot
+    alongside legacy code in incremental steps.
+  expected_output: >
+    - Phased Extraction Plan (criteria, steps, deliverables)  
+    - Dependency minimization strategies
+  agent: migration_agent
+
+plan_migration_roadmap:
+  description: >
+    Prioritize refactoring tasks; group changes into phases
+    (e.g., logging upgrade, date/time API migration);
+    schedule phases within the project timeline and include
+    human review checkpoints.
+  expected_output: >
+    - Migration Roadmap: phases, timelines, dependencies, risk mitigations
+  agent: migration_agent
+  human_input: true
+
+final_handover_and_summary:
+  description: >
+    Consolidate all outputs into an executive stakeholder report:
+    highlight completed phases, risk mitigations, performance improvements, and next steps.
+  expected_output: >
+    - Polished Modernization Summary Report  
+    - Executive presentation slides (optional)
+  agent: migration_agent
+  human_input: true
+
+
+
+
+
+
+
+
+#execute_refactoring:
+#  description: >
+#    Apply automated code transformations in batches:
+#    use OpenRewrite for mechanical changes and LLM for complex
+#    API swaps, then commit diffs for review.
+#  expected_output: >
+#    A series of clean diffs ready for merge,
+#    each passing initial compilation.
+#  agent: refactoring_agent
+##  tools:
+##    - OpenRewriteTool
+##    - CompilerTool
+##    - TestRunnerTool
+
+#validate_changes:
+#  description: >
+#    Run full test suite, static checks, and smoke tests
+#    on each refactoring batch to catch regressions early.
+#  expected_output: >
+#    Test result reports and static analysis dashboards
+#    confirming code health.
+#  agent: testing_agent
+#  tools:
+#    - TestRunnerTool
+#    - StaticAnalyzerTool
+
+#update_docs_after_refactor:
+#  description: >
+#    Refresh all previously generated documentation to reflect
+#    code changes, ensuring code and docs remain in sync.
+#  expected_output: >
+#    Updated knowledge base with accurate, up-to-date docs.
+#  agent: documentation_agent
+#  tools:
+#    - KnowledgeBaseTool

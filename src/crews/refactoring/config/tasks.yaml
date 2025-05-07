@@ -1,0 +1,127 @@
+# used in migration_crew
+select_module_to_migrate:
+  description: >
+    Scheduler Agent selects the next least-coupled module or highest-value feature
+    as per the roadmap and marks it for migration.
+  expected_output: >
+    - Selected module identifier and path  
+    - Migration priority rationale  
+  agent: migration_scheduler_agent
+  reviewer: project_manager_agent
+  tools:
+    - KnowledgeBaseTool
+    - SchedulingTool
+  timebox: 4h :contentReference[oaicite:8]{index=8}
+
+generate_migration_diff:
+  description: >
+    Executor Agent applies OpenRewrite recipes and LLM-prompts
+    to transform Java 10 code to Java 21 constructs.
+  expected_output: >
+    - Patch file (diff) for module  
+    - Refactoring log with transformation rationale  
+  agent: migration_executor_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - OpenRewriteTool
+    - LLMCoderTool
+  timebox: 1d :contentReference[oaicite:9]{index=9}
+
+compile_and_run_tests:
+  description: >
+    Test Runner Agent compiles the migrated code and executes unit
+    and integration tests; reports failures and coverage metrics.
+  expected_output: >
+    - Build status (success/failure)  
+    - Test report with coverage summary  
+  agent: test_runner_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - CompilerTool
+    - TestRunnerTool
+  timebox: 4h :contentReference[oaicite:10]{index=10}
+
+analyze_and_debug_failures:
+  description: >
+    Debugger Agent parses compilation errors and test failures,
+    generates and applies fixes via LLM prompts or AST patches,
+    then re-runs compilation.
+  expected_output: >
+    - Updated patch resolving errors  
+    - Debug log with error-to-fix mapping  
+  agent: debugger_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - CompilerTool
+    - LLMDebuggerTool
+  timebox: 1d :contentReference[oaicite:11]{index=11}
+
+generate_additional_tests:
+  description: >
+    Test Runner Agent uses LLM-driven TestGen-LLM to create unit tests
+    for newly migrated code paths lacking coverage.
+  expected_output: >
+    - New unit test files  
+    - TestGen report linking tests to code regions  
+  agent: test_runner_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - TestGenLLMTool
+    - CoverageAnalyzerTool
+  timebox: 8h :contentReference[oaicite:12]{index=12}
+
+run_integration_smoke_tests:
+  description: >
+    Test Runner Agent orchestrates lightweight end-to-end validation
+    in a sandbox environment to detect regressions.
+  expected_output: >
+    - Smoke test report  
+    - Sanity check log (key API endpoints)  
+  agent: test_runner_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - SandboxExecutionTool
+    - IntegrationTestTool
+  timebox: 4h :contentReference[oaicite:13]{index=13}
+
+code_review_and_approval:
+  description: >
+    QA Agent performs automated code reviews—style, security, performance—
+    and flags any issues or approves the diff for merge.
+  expected_output: >
+    - Code review summary  
+    - Approval status or issue list  
+  agent: quality_assurance_agent
+  reviewer: project_manager_agent
+  tools:
+    - StaticAnalyzerTool
+    - LLMCriticTool
+  timebox: 8h :contentReference[oaicite:14]{index=14}
+
+finalize_migration_and_merge:
+  description: >
+    Project Manager Agent consolidates all approved patches,
+    updates the central knowledge base, and merges changes into mainline.
+  expected_output: >
+    - Merged commit history  
+    - Updated documentation references  
+  agent: project_manager_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - VersionControlTool
+    - KnowledgeBaseTool
+  timebox: 4h :contentReference[oaicite:15]{index=15}
+
+update_documentation_post_migration:
+  description: >
+    Documentation Agent revisits and updates docs (Javadoc, diagrams)
+    to reflect migrated code paths and new dependencies.
+  expected_output: >
+    - Revised module docs  
+    - New Mermaid diagrams as needed  
+  agent: documentation_agent
+  reviewer: quality_assurance_agent
+  tools:
+    - CodeParserTool
+    - DiagramGeneratorTool
+  timebox: 1d :contentReference[oaicite:16]{index=16}

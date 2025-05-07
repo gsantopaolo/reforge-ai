@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 # src/main.py
+# Must precede any llm module imports
 
 import sys, os, shutil, subprocess, json
-from documentation_crew import DocumentationCrew
+from langtrace_python_sdk import langtrace
+
+langtrace.init(api_key = os.getenv("LANGTRACE_API_KEY"))
+
+
+
+
+from sympy.codegen.ast import Raise
+
+from crews.documentation.documentation_crew import DocumentationCrew
 
 def prepare_codebase(target: str) -> str:
     if target.startswith("http"):
@@ -40,15 +50,21 @@ if __name__=="__main__":
     os.makedirs(docs_dir, exist_ok=True)
     os.makedirs(state_dir, exist_ok=True)
 
+    kb_dir = "kb"
+
     print(f"code base: {codebase_path}")
     print(f"docs dir: {docs_dir}")
     print(f"codbase: {os.path.basename(codebase_path)}")
+    print(f"kb_path: {os.path.abspath(kb_dir)}")
 
-    crew = DocumentationCrew(codebase_path, docs_dir).crew()
+    # raise Exception("stopping for debug..")
+
+    crew = DocumentationCrew(codebase_path, docs_dir, kb_dir).crew()
     state = crew.kickoff({
         "codebase": os.path.basename(codebase_path),
         "code_path": codebase_path,
-        "doc_path": os.path.abspath(docs_dir)
+        "doc_path": os.path.abspath(docs_dir),
+        "kb_path": os.path.basename(kb_dir)
     })
 
     out_file = os.path.join(state_dir, "documentation_state.json")
