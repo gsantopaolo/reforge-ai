@@ -7,11 +7,9 @@ select_module_to_migrate:
     - Selected module identifier and path  
     - Migration priority rationale  
   agent: migration_scheduler_agent
-  reviewer: project_manager_agent
   tools:
     - KnowledgeBaseTool
     - SchedulingTool
-  timebox: 4h :contentReference[oaicite:8]{index=8}
 
 generate_migration_diff:
   description: >
@@ -19,13 +17,11 @@ generate_migration_diff:
     to transform Java 10 code to Java 21 constructs.
   expected_output: >
     - Patch file (diff) for module  
-    - Refactoring log with transformation rationale  
+    - Refactoring log with transformation rationale
   agent: migration_executor_agent
-  reviewer: quality_assurance_agent
   tools:
     - OpenRewriteTool
     - LLMCoderTool
-  timebox: 1d :contentReference[oaicite:9]{index=9}
 
 compile_and_run_tests:
   description: >
@@ -33,13 +29,11 @@ compile_and_run_tests:
     and integration tests; reports failures and coverage metrics.
   expected_output: >
     - Build status (success/failure)  
-    - Test report with coverage summary  
+    - Test report with coverage summary
   agent: test_runner_agent
-  reviewer: quality_assurance_agent
   tools:
     - CompilerTool
     - TestRunnerTool
-  timebox: 4h :contentReference[oaicite:10]{index=10}
 
 analyze_and_debug_failures:
   description: >
@@ -48,13 +42,11 @@ analyze_and_debug_failures:
     then re-runs compilation.
   expected_output: >
     - Updated patch resolving errors  
-    - Debug log with error-to-fix mapping  
+    - Debug log with error-to-fix mapping
   agent: debugger_agent
-  reviewer: quality_assurance_agent
   tools:
     - CompilerTool
     - LLMDebuggerTool
-  timebox: 1d :contentReference[oaicite:11]{index=11}
 
 generate_additional_tests:
   description: >
@@ -62,13 +54,11 @@ generate_additional_tests:
     for newly migrated code paths lacking coverage.
   expected_output: >
     - New unit test files  
-    - TestGen report linking tests to code regions  
+    - TestGen report linking tests to code regions
   agent: test_runner_agent
-  reviewer: quality_assurance_agent
   tools:
     - TestGenLLMTool
     - CoverageAnalyzerTool
-  timebox: 8h :contentReference[oaicite:12]{index=12}
 
 run_integration_smoke_tests:
   description: >
@@ -76,13 +66,23 @@ run_integration_smoke_tests:
     in a sandbox environment to detect regressions.
   expected_output: >
     - Smoke test report  
-    - Sanity check log (key API endpoints)  
+    - Sanity check log (key API endpoints)
   agent: test_runner_agent
-  reviewer: quality_assurance_agent
   tools:
     - SandboxExecutionTool
     - IntegrationTestTool
-  timebox: 4h :contentReference[oaicite:13]{index=13}
+
+security_and_performance_scan:
+  description: >
+    QA Agent runs SAST (e.g., OWASP dependency-check) and performance
+    benchmarks (e.g., JMH) on the migrated code.
+  expected_output: >
+    - Vulnerability report  
+    - Performance baseline metrics
+  agent: quality_assurance_agent
+  tools:
+    - SecurityScanTool
+    - BenchmarkTool
 
 code_review_and_approval:
   description: >
@@ -90,13 +90,11 @@ code_review_and_approval:
     and flags any issues or approves the diff for merge.
   expected_output: >
     - Code review summary  
-    - Approval status or issue list  
+    - Approval status or issue list
   agent: quality_assurance_agent
-  reviewer: project_manager_agent
   tools:
     - StaticAnalyzerTool
     - LLMCriticTool
-  timebox: 8h :contentReference[oaicite:14]{index=14}
 
 finalize_migration_and_merge:
   description: >
@@ -104,13 +102,11 @@ finalize_migration_and_merge:
     updates the central knowledge base, and merges changes into mainline.
   expected_output: >
     - Merged commit history  
-    - Updated documentation references  
+    - Updated documentation references
   agent: project_manager_agent
-  reviewer: quality_assurance_agent
   tools:
     - VersionControlTool
     - KnowledgeBaseTool
-  timebox: 4h :contentReference[oaicite:15]{index=15}
 
 update_documentation_post_migration:
   description: >
@@ -118,10 +114,8 @@ update_documentation_post_migration:
     to reflect migrated code paths and new dependencies.
   expected_output: >
     - Revised module docs  
-    - New Mermaid diagrams as needed  
+    - New Mermaid diagrams as needed
   agent: documentation_agent
-  reviewer: quality_assurance_agent
   tools:
     - CodeParserTool
     - DiagramGeneratorTool
-  timebox: 1d :contentReference[oaicite:16]{index=16}
