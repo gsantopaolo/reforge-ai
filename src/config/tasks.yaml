@@ -1,0 +1,101 @@
+# used in documentation_crew
+initialize_project_kb:
+  description: >
+    Set up the central knowledge base structure: create sections
+    for architecture, modules, dependencies, migration incidents, and runbooks.
+  expected_output: >
+    A fully scaffolded repository or wiki with empty templates
+    ready for analysis and documentation.
+  agent: project_manager_agent
+
+# used in documentation_crew
+inventory_codebase:
+  description: >
+    Scan the entire repository to map packages, modules,
+    and external dependencies. Identify high-impact components
+    by size and change frequency.
+  expected_output: >
+    A Codebase Report containing module graphs,
+    dependency lists, and hotspot rankings.
+  agent: codebase_analyst_agent
+
+# used in documentation_crew
+analyze_legacy_code:
+  description: >
+    Run static-analysis rules and OpenRewrite recipes to detect
+    deprecated Java 10 APIs, removed JVM flags, and framework mismatches.
+  expected_output: >
+    A Modernization Incidents List detailing each deprecated API use,
+    library upgrade need, and migration blocker.
+  agent: codebase_analyst_agent
+
+# used in documentation_crew
+generate_module_docs:
+  description: >
+    For each significant module, auto-generate Javadoc comments,
+    write a high-level overview, and summarize key classes and flows.
+  expected_output: >
+    Comprehensive documentation files per module,
+    including class diagrams and plain-English summaries.
+  agent: documentation_agent
+
+# used in documentation_crew
+plan_migration_roadmap:
+  description: >
+    Prioritize refactoring tasks, group changes into phases
+    (e.g., logging upgrade, date/time API migration),
+    and schedule them against the project timeline.
+  expected_output: >
+    A Migration Roadmap document detailing phases,
+    dependencies, and risk mitigation steps.
+  agent: project_manager_agent
+  human_input: true
+
+#execute_refactoring:
+#  description: >
+#    Apply automated code transformations in batches:
+#    use OpenRewrite for mechanical changes and LLM for complex
+#    API swaps, then commit diffs for review.
+#  expected_output: >
+#    A series of clean diffs ready for merge,
+#    each passing initial compilation.
+#  agent: refactoring_agent
+##  tools:
+##    - OpenRewriteTool
+##    - CompilerTool
+##    - TestRunnerTool
+
+#validate_changes:
+#  description: >
+#    Run full test suite, static checks, and smoke tests
+#    on each refactoring batch to catch regressions early.
+#  expected_output: >
+#    Test result reports and static analysis dashboards
+#    confirming code health.
+#  agent: testing_agent
+#  tools:
+#    - TestRunnerTool
+#    - StaticAnalyzerTool
+
+update_docs_after_refactor:
+  description: >
+    Refresh all previously generated documentation to reflect
+    code changes, ensuring code and docs remain in sync.
+  expected_output: >
+    Updated knowledge base with accurate, up-to-date docs.
+  agent: documentation_agent
+#  tools:
+#    - KnowledgeBaseTool
+
+final_handover_and_summary:
+  description: >
+    Consolidate all outputs into a stakeholder report:
+    highlight completed phases, risk mitigations,
+    and performance improvements.
+  expected_output: >
+    A polished Modernization Summary Report
+    ready for executive review.
+  agent: reviewer_agent
+#  tools:
+#    - LLMDiagnosticTool
+  human_input: true
