@@ -198,5 +198,7 @@ class DocumentationCrew:
             # process=Process.sequential,
             process=Process.hierarchical, #switched to hierarchical to enable the reviewer_agent
             manager_agent=manager,
+            manager_llm=llm_client,
+            planning=True,
             verbose=True
         )
