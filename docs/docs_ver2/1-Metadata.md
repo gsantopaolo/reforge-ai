@@ -1,5 +1,5 @@
 File Index (MD tree format):
-
+```
 kitchensink/src/main/java/org/jboss/as/quickstarts/kitchensink/
 ├── util/
 │   └── Resources.java
@@ -43,7 +43,7 @@ kitchensink/src/test/java/org/jboss/as/quickstarts/kitchensink/test/
 │   - package: org.jboss.as.quickstarts.kitchensink.test
 │   - classes: MemberRegistrationIT
 │   - interfaces: none
-
+```
 Summary:
 - Total files parsed: 13
 - Total classes: 16
