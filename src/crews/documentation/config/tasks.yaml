@@ -68,13 +68,22 @@ plan_phased_module_extraction:
     Identify the least-coupled module via coupling metrics;
     create a stepwise extraction plan to implement it in Java 21 and Spring Boot
     alongside legacy code in incremental steps.
+    The plan is ment to be executed by an agentic AI with human interaction.
   expected_output: >
     - Phased Extraction Plan (criteria, steps, deliverables)  
     - Dependency minimization strategies
+    - List of all the component to migrate from the simplest, the less coupled
+    - The plan is ment to be used by an agentic AI must be writen in great details
+    but it shall contain a paragraph with the list of actions the AI shall perform, eg. 
+    1. migration of the files (list the files) in a new module supporting Java 21
+    - Another paragraph shall detail how to make coexists the lecacy and the updated module
   agent: migration_agent
+  human_input: true
 
 plan_migration_roadmap:
   description: >
+    Review all the documentation produced so far. 
+    If you are not able to review it let the user know.
     Prioritize refactoring tasks; group changes into phases
     (e.g., logging upgrade, date/time API migration);
     schedule phases within the project timeline and include
@@ -92,7 +101,6 @@ final_handover_and_summary:
     - Polished Modernization Summary Report  
     - Executive presentation slides (optional)
   agent: migration_agent
-  human_input: true
 
 
 

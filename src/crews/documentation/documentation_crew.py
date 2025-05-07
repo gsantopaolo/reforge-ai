@@ -136,7 +136,7 @@ class DocumentationCrew:
             ],
             llm=llm_client,
             verbose=True,
-            allow_delegation=False
+            allow_delegation=True
         )
 
     # ────────── Tasks ──────────
@@ -184,7 +184,7 @@ class DocumentationCrew:
     @task
     def final_handover_and_summary(self) -> Task:
         return Task(config=self.tasks_config["final_handover_and_summary"],
-                    output_file="1-documentation/docs/9-FinalHandoverAndSummary.md")
+                    output_file="1-documentation/docs/0-ExecutiveSummary.md")
 
     # ────────── Build Crew ──────────
 
