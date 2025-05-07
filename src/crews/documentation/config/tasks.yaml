@@ -69,14 +69,28 @@ plan_phased_module_extraction:
     create a stepwise extraction plan to implement it in Java 21 and Spring Boot
     alongside legacy code in incremental steps.
     The plan is ment to be executed by an agentic AI with human interaction.
+    When evaluating the best way to migrate the legacy app to Java 21 Spring Boot, also keep in consideration:
+    1. Domain-driven module boundaries over purely “least-coupled” metrics 
+    2. Spring Modulith intermediate step before microservices 
+    3. Gateway/proxy routing for coexisting legacy and Spring Boot 
+    4. Leverage OpenRewrite Spring Boot 3.2 recipes for build and config 
+    5. Plan adoption of virtual threads in high-throughput components 
+    6. Implementing the Strangler Fig and incremental migration principles
+    For each of the points above serach the internet and do accurate consideration based on the specific
+    use case you are evaluating.
   expected_output: >
     - Phased Extraction Plan (criteria, steps, deliverables)  
     - Dependency minimization strategies
     - List of all the component to migrate from the simplest, the less coupled
     - The plan is ment to be used by an agentic AI must be writen in great details
     but it shall contain a paragraph with the list of actions the AI shall perform, eg. 
-    1. migration of the files (list the files) in a new module supporting Java 21
+    migration of the files (list the files) in a new module supporting Java 21
     - Another paragraph shall detail how to make coexists the lecacy and the updated module
+    - Extraction plan in yaml format (inside the md document you will produce) similar to the following:
+      - phases: id, description, output, suggested tools (KnowledgeBaseTool, DomainModelAnalyzerTool,
+        CodeLoaderTool, ModulithGeneratorTool, GatewayConfiguratorTool, OpenRewriteTool, CompilerTool, 
+        TestRunnerTool, DiagramGeneratorTool, DocumentationTool)
+    - do not consider any CI/CD, source control or integration test, phases
   agent: migration_agent
   human_input: true
 
