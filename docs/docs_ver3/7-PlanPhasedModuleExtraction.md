@@ -1,4 +1,3 @@
-```
 Phased Extraction Plan for Migrating the Least-Coupled Module (util.Resources) to Java 21 and Spring Boot
 
 1. Identification of the Least-Coupled Module
@@ -108,4 +107,3 @@ This strategic approach can then be leveraged as a model for subsequent module m
 ---
 
 # End of Phased Extraction Plan.
-```
