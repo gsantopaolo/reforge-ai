@@ -57,7 +57,7 @@ if __name__ == "__main__":
     os.makedirs(state_dir, exist_ok=True)
 
     # Knowledge base directory
-    kb_dir = "kb"
+    kb_dir = "kb-code"
 
     print(f"codebase: {codebase_path}")
     print(f"output dir: {output_dir}")

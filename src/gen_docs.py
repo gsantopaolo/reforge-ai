@@ -50,7 +50,7 @@ if __name__=="__main__":
     os.makedirs(docs_dir, exist_ok=True)
     os.makedirs(state_dir, exist_ok=True)
 
-    kb_dir = "kb"
+    kb_dir = "kb-docs"
 
     print(f"code base: {codebase_path}")
     print(f"docs dir: {docs_dir}")
