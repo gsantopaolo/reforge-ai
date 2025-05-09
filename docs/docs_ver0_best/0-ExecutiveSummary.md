@@ -1,9 +1,9 @@
----
+
 # Executive Stakeholder Report
 
 ## Modernization of kitchensink Java EE Project to Spring Boot on Java 21  
-*Date: [Today]*  
-*Prepared by: Strategic Orchestrator and Governance Agent*
+**Date: [Today]**  
+**Prepared by: Strategic Orchestrator and Governance Agent**
 
 ---
 
