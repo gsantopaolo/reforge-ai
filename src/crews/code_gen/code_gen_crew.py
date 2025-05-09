@@ -1,193 +1,163 @@
-# src/refactoring_crew.py
+# src/crews/code_gen/code_gen_crew.py
 #!/usr/bin/env python3
 
 import os
-from pathlib import Path
-
-from crewai import Agent, Crew, Process, Task, LLM
+from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from typing import Any
+from langchain_openai import ChatOpenAI # Or your preferred LLM provider
+from typing import Any, Dict
 
-# Placeholder imports for custom tools
-from tools.migration_scheduler_tool import MigrationSchedulerTool
-from tools.openrewrite_tool import OpenRewriteTool
-from tools.llm_coder_tool import LLMCoderTool
-from tools.compiler_tool import CompilerTool
-from tools.test_runner_tool import TestRunnerTool
-from tools.llm_debugger_tool import LLMDebuggerTool
-from tools.testgen_llm_tool import TestGenLLMTool
-from tools.coverage_analyzer_tool import CoverageAnalyzerTool
-from tools.static_analyzer_tool import StaticAnalyzerTool
-from tools.security_scan_tool import SecurityScanTool
-from tools.benchmark_tool import BenchmarkTool
-from tools.diff_analyzer import DiffAnalyzerTool
+# Import our defined tools
+from tools.plan_tool import PlanTool
+from tools.file_system_read_tool import FileSystemReadTool
+from tools.code_search_tool import CodeSearchTool
+from tools.open_rewrite_tool import OpenRewriteTool
+from tools.file_system_read_write_tool import FileSystemReadWriteTool
+from tools.legacy_compiler_tool import LegacyCompilerTool
+from tools.spring_boot_compiler_tool import SpringBootCompilerTool
 
-# Choose provider
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
-_default_models = {"openai": "gpt-4.1-mini", "anthropic": "anthropic/claude-3-sonnet-20240229-v1:0"}
-model_name = os.getenv("MODEL_NAME", _default_models.get(LLM_PROVIDER))
-api_key_env = f"{LLM_PROVIDER.upper()}_API_KEY"
-llm_client = LLM(model=model_name, api_key=os.getenv(api_key_env))
+llm = ChatOpenAI(
+    model_name=os.getenv("OPENAI_MODEL_NAME", "gpt-4-turbo-preview"),
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
 
 @CrewBase
 class CodeGenCrew:
-    """
-    RefactoringCrew: automates migration of Kitchensink Java code
-    to Spring Boot 3.2 + Java 21 via specialized AI agents.
-    """
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
     agents: Any
-    agents_config: Any
-    tasks_config: Any
     tasks: Any
 
-    def __init__(self, codebase_path: str, refactor_path: str, kb_path: str):
+    def __init__(self,
+                 plan_file_path: str,
+                 codebase_path: str,
+                 gen_docs_output_path: str,
+                 kb_docs_path: str,
+                 kb_code_path: str,
+                 working_code_path: str):
+        self.plan_file_path = plan_file_path
         self.codebase_path = codebase_path
-        self.refactor_path = refactor_path
-        self.kb_path = kb_path
+        self.gen_docs_output_path = gen_docs_output_path
+        self.kb_docs_path = kb_docs_path
+        self.kb_code_path = kb_code_path
+        self.working_code_path = working_code_path
 
-    # ────────── Agents ──────────
     @agent
-    def migration_scheduler_agent(self) -> Agent:
+    def team_lead(self) -> Agent:
         return Agent(
-            config=self.agents_config['migration_scheduler_agent'],
-            tools=[MigrationSchedulerTool()],
-            llm=llm_client,
-            verbose=True,
-            allow_delegation=True
+            config=self.agents_config['team_lead'],
+            tools=[PlanTool(plan_file=self.plan_file_path)], # TeamLead now needs PlanTool for the validation task
+            llm=llm,
+            verbose=True
         )
 
     @agent
-    def migration_executor_agent(self) -> Agent:
+    def software_architect(self) -> Agent:
         return Agent(
-            config=self.agents_config['migration_executor_agent'],
-            tools=[OpenRewriteTool(), LLMCoderTool()],
-            llm=llm_client,
-            verbose=True,
-            allow_delegation=False
-        )
-
-    @agent
-    def test_runner_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config['test_runner_agent'],
-            tools=[CompilerTool(), TestRunnerTool(), TestGenLLMTool(), CoverageAnalyzerTool()],
-            llm=llm_client,
+            config=self.agents_config['software_architect'],
+            tools=[
+                PlanTool(plan_file=self.plan_file_path),
+                FileSystemReadTool(),
+                CodeSearchTool(
+                    gen_docs_path=self.gen_docs_output_path,
+                    kb_docs_path=self.kb_docs_path,
+                    kb_code_path=self.kb_code_path
+                )
+            ],
+            llm=llm,
             verbose=True,
             allow_delegation=False
         )
 
     @agent
-    def debugger_agent(self) -> Agent:
+    def principal_software_engineer(self) -> Agent:
         return Agent(
-            config=self.agents_config['debugger_agent'],
-            tools=[LLMDebuggerTool()],
-            llm=llm_client,
+            config=self.agents_config['principal_software_engineer'],
+            tools=[
+                OpenRewriteTool(),
+                FileSystemReadWriteTool(base_write_path=self.working_code_path)
+            ],
+            llm=llm,
             verbose=True,
             allow_delegation=False
         )
 
     @agent
-    def quality_assurance_agent(self) -> Agent:
+    def build_and_test_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['quality_assurance_agent'],
-            tools=[StaticAnalyzerTool(), SecurityScanTool(), BenchmarkTool(), DiffAnalyzerTool()],
-            llm=llm_client,
+            config=self.agents_config['build_and_test_agent'],
+            tools=[
+                LegacyCompilerTool(legacy_code_path=self.codebase_path),
+                SpringBootCompilerTool(spring_code_path=self.working_code_path)
+            ],
+            llm=llm,
             verbose=True,
             allow_delegation=False
         )
 
-    @agent
-    def documentation_agent(self) -> Agent:
-        return Agent(
-            config=self.agents_config['documentation_agent'],
-            # tools=[DiagramGeneratorTool()],
-            llm=llm_client,
-            verbose=True,
-            allow_delegation=False
-        )
-
-    # ────────── Tasks ──────────
     @task
-    def select_module_to_migrate(self) -> Task:
+    def create_modernization_step_brief_task(self) -> Task:
         return Task(
-            config=self.tasks_config['select_module_to_migrate'],
-            output_file="2-refactoring/state/selected-module.json"
+            config=self.tasks_config['create_modernization_step_brief'],
+            agent=self.software_architect(),
+            # Input: {current_plan_step_identifier} will be in kickoff_inputs
+            # Output: step_brief_output (string)
         )
 
     @task
-    def generate_migration_diff(self) -> Task:
+    def implement_code_changes_task(self) -> Task:
         return Task(
-            config=self.tasks_config['generate_migration_diff'],
-            output_file="2-refactoring/diffs/migration.patch"
+            config=self.tasks_config['implement_code_changes'],
+            agent=self.principal_software_engineer(),
+            context=[self.create_modernization_step_brief_task()], # Depends on the brief
+            # Input: {step_brief_output} from context
+            # Output: code_changes_output (dict: {'diff': str, 'path': str})
         )
 
     @task
-    def compile_and_run_tests(self) -> Task:
+    def compile_modernized_code_task(self) -> Task:
         return Task(
-            config=self.tasks_config['compile_and_run_tests'],
-            output_file="2-refactoring/state/test-report.json"
+            config=self.tasks_config['compile_modernized_code'],
+            agent=self.build_and_test_agent(),
+            context=[self.implement_code_changes_task()], # Depends on code changes path
+            # Input: {code_changes_output} (specifically the path) from context
+            # Output: build_results_output (dict)
         )
 
     @task
-    def analyze_and_debug_failures(self) -> Task:
+    def request_human_validation_task(self) -> Task:
+        # This task's description in tasks.yaml uses placeholders like
+        # {step_brief_output}, {code_changes_output}, {build_results_output},
+        # and {current_plan_step_identifier}. These must be filled from context
+        # or kickoff_inputs when the task is executed.
         return Task(
-            config=self.tasks_config['analyze_and_debug_failures'],
-            output_file="2-refactoring/diffs/debug.patch"
+            config=self.tasks_config['request_human_validation'],
+            agent=self.team_lead(), # TeamLead executes this task
+            human_input=True, # CrewAI will pause for input
+            context=[ # Depends on outputs of all previous tasks
+                self.create_modernization_step_brief_task(),
+                self.implement_code_changes_task(),
+                self.compile_modernized_code_task()
+            ]
+            # Output: user_decision_string (string)
         )
 
-    @task
-    def generate_additional_tests(self) -> Task:
-        return Task(
-            config=self.tasks_config['generate_additional_tests'],
-            output_file="2-refactoring/tests/new-tests.java"
-        )
-
-    @task
-    def run_integration_smoke_tests(self) -> Task:
-        return Task(
-            config=self.tasks_config['run_integration_smoke_tests'],
-            output_file="2-refactoring/state/smoke-test.json"
-        )
-
-    @task
-    def security_and_performance_scan(self) -> Task:
-        return Task(
-            config=self.tasks_config['security_and_performance_scan'],
-            output_file="2-refactoring/state/security-performance.json"
-        )
-
-    @task
-    def code_review_and_approval(self) -> Task:
-        return Task(
-            config=self.tasks_config['code_review_and_approval'],
-            output_file="2-refactoring/docs/code-review.md"
-        )
-
-    @task
-    def finalize_migration_and_merge(self) -> Task:
-        return Task(
-            config=self.tasks_config['finalize_migration_and_merge'],
-            output_file="2-refactoring/state/final-merge.json"
-        )
-
-    @task
-    def update_documentation_post_migration(self) -> Task:
-        return Task(
-            config=self.tasks_config['update_documentation_post_migration'],
-            output_file="2-refactoring/docs/updated-docs.md"
-        )
-
-    # ────────── Build Crew ──────────
     @crew
-    def crew(self) -> Crew:
-        manager = self.migration_scheduler_agent()
-        operational_agents = [a for a in self.agents if a is not manager]
+    def build_crew_for_step(self) -> Crew:
         return Crew(
-            agents=operational_agents,
-            tasks=self.tasks,
+            agents=[ # TeamLead is now also a worker agent for its specific task
+                self.team_lead(),
+                self.software_architect(),
+                self.principal_software_engineer(),
+                self.build_and_test_agent()
+            ],
+            tasks=[
+                self.create_modernization_step_brief_task(),
+                self.implement_code_changes_task(),
+                self.compile_modernized_code_task(),
+                self.request_human_validation_task() # Human validation is the last step
+            ],
             process=Process.hierarchical,
-            manager_agent=manager,
+            manager_llm=self.team_lead().llm, # TeamLead's LLM still manages overall flow
             verbose=True
         )

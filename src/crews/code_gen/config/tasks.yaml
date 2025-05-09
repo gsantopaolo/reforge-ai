@@ -1,121 +1,49 @@
-# used in migration_crew
-select_module_to_migrate:
-  description: >
-    Scheduler Agent selects the next least-coupled module or highest-value feature
-    as per the roadmap and marks it for migration.
-  expected_output: >
-    - Selected module identifier and path  
-    - Migration priority rationale  
-  agent: migration_scheduler_agent
-  tools:
-    - KnowledgeBaseTool
-    - SchedulingTool
+# Tasks for the Code Generation (gen_code) Crew for a single modernization plan step.
+# These tasks are orchestrated by the TeamLead (manager_llm).
 
-generate_migration_diff:
+create_modernization_step_brief:
   description: >
-    Executor Agent applies OpenRewrite recipes and LLM-prompts
-    to transform Java 10 code to Java 21 constructs.
+    For the current modernization plan step (identified by PlanTool using input 'current_plan_step_identifier'), 
+    thoroughly analyze all relevant `gen_docs` outputs, `kb_docs` artifacts, and the entire `kb_code` directory.
+    Synthesize these findings into a comprehensive "Modernization Step Brief".
+    This brief must clearly state the step's objectives, incorporate detailed analysis from `gen_docs`,
+    highlight best practices from `kb_docs`, and critically, provide specific code examples, warnings,
+    workarounds, and direct guidance from `kb_code`. Emphasize `kb_code` as the primary source of truth.
   expected_output: >
-    - Patch file (diff) for module  
-    - Refactoring log with transformation rationale
-  agent: migration_executor_agent
-  tools:
-    - OpenRewriteTool
-    - LLMCoderTool
+    A detailed "Modernization Step Brief" document (string format) containing:
+    1. Current plan step objectives.
+    2. Relevant analysis summary from `gen_docs`.
+    3. Applicable patterns from `kb_docs`.
+    4. Crucial code examples, solutions, and warnings from `kb_code`.
+    5. Clear guidance on how `kb_code` informs this specific step.
+  agent: software_architect
+  # 'current_plan_step_identifier' would be passed into the crew's kickoff method.
 
-compile_and_run_tests:
+implement_code_changes:
   description: >
-    Test Runner Agent compiles the migrated code and executes unit
-    and integration tests; reports failures and coverage metrics.
+    Based on the provided "Modernization Step Brief", implement the required code transformations.
+    Utilize OpenRewriteTool for AST-based changes where specified or appropriate.
+    Write new Java 21 / Spring Boot code or modify existing code in the designated working directory.
+    Ensure all code generation heavily references and adheres to the guidance, examples, and solutions
+    from `kb_code` as highlighted in the brief.
   expected_output: >
-    - Build status (success/failure)  
-    - Test report with coverage summary
-  agent: test_runner_agent
-  tools:
-    - CompilerTool
-    - TestRunnerTool
+    1. Path to the working directory containing all modified and newly generated code.
+    2. A diff or patch file summarizing all code changes made during this task.
+  agent: principal_software_engineer
+  context: # Depends on the output of 'create_modernization_step_brief'
+    # The actual brief content will be passed as context by the TeamLead/manager.
 
-analyze_and_debug_failures:
+compile_modernized_code:
   description: >
-    Debugger Agent parses compilation errors and test failures,
-    generates and applies fixes via LLM prompts or AST patches,
-    then re-runs compilation.
+    Compile the modernized Java 21 / Spring Boot code located in the working directory 
+    (path provided from the 'implement_code_changes' task output). 
+    If the "Modernization Step Brief" or plan step specifies, also compile the legacy codebase 
+    using the LegacyCompilerTool for baseline or comparison.
   expected_output: >
-    - Updated patch resolving errors  
-    - Debug log with error-to-fix mapping
-  agent: debugger_agent
-  tools:
-    - CompilerTool
-    - LLMDebuggerTool
-
-generate_additional_tests:
-  description: >
-    Test Runner Agent uses LLM-driven TestGen-LLM to create unit tests
-    for newly migrated code paths lacking coverage.
-  expected_output: >
-    - New unit test files  
-    - TestGen report linking tests to code regions
-  agent: test_runner_agent
-  tools:
-    - TestGenLLMTool
-    - CoverageAnalyzerTool
-
-run_integration_smoke_tests:
-  description: >
-    Test Runner Agent orchestrates lightweight end-to-end validation
-    in a sandbox environment to detect regressions.
-  expected_output: >
-    - Smoke test report  
-    - Sanity check log (key API endpoints)
-  agent: test_runner_agent
-  tools:
-    - SandboxExecutionTool
-    - IntegrationTestTool
-
-security_and_performance_scan:
-  description: >
-    QA Agent runs SAST (e.g., OWASP dependency-check) and performance
-    benchmarks (e.g., JMH) on the migrated code.
-  expected_output: >
-    - Vulnerability report  
-    - Performance baseline metrics
-  agent: quality_assurance_agent
-  tools:
-    - SecurityScanTool
-    - BenchmarkTool
-
-code_review_and_approval:
-  description: >
-    QA Agent performs automated code reviews—style, security, performance—
-    and flags any issues or approves the diff for merge.
-  expected_output: >
-    - Code review summary  
-    - Approval status or issue list
-  agent: quality_assurance_agent
-  tools:
-    - StaticAnalyzerTool
-    - LLMCriticTool
-
-finalize_migration_and_merge:
-  description: >
-    Project Manager Agent consolidates all approved patches,
-    updates the central knowledge base, and merges changes into mainline.
-  expected_output: >
-    - Merged commit history  
-    - Updated documentation references
-  agent: project_manager_agent
-  tools:
-    - VersionControlTool
-    - KnowledgeBaseTool
-
-update_documentation_post_migration:
-  description: >
-    Documentation Agent revisits and updates docs (Javadoc, diagrams)
-    to reflect migrated code paths and new dependencies.
-  expected_output: >
-    - Revised module docs  
-    - New Mermaid diagrams as needed
-  agent: documentation_agent
-  tools:
-    - CodeParserTool
-    - DiagramGeneratorTool
+    1. Build status for the modernized code (SUCCESS/FAILURE).
+    2. Compilation logs for the modernized code.
+    3. (If applicable) Build status for the legacy code.
+    4. (If applicable) Compilation logs for the legacy code.
+  agent: build_and_test_agent
+  context: # Depends on the output of 'implement_code_changes'
+    # The path to the code will be passed as context.

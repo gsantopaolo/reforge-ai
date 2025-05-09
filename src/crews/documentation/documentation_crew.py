@@ -22,7 +22,8 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
 # Default model names per provider (override via MODEL_NAME if needed)
 _default_models = {
     "openai": "gpt-4.1-mini",
-    "anthropic": "anthropic/claude-3-sonnet-20240229-v1:0"
+    "anthropic": "anthropic/claude-3-7-sonnet-20250219",
+    "gemini": "gemini/gemini-2.5-pro-exp-03-25"
 }
 model_name = os.getenv("MODEL_NAME", _default_models.get(LLM_PROVIDER))
 

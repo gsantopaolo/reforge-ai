@@ -56,6 +56,8 @@ if __name__=="__main__":
     print(f"docs dir: {docs_dir}")
     print(f"codbase: {os.path.basename(codebase_path)}")
     print(f"kb_path: {os.path.abspath(kb_dir)}")
+    llm = os.getenv("LLM_PROVIDER").upper()
+    print(f"GenAI provider in use: {llm}")
 
     # raise Exception("stopping for debug..")
 

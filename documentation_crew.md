@@ -1,15 +1,3 @@
-**Clarifying documentation task**
-
-The user seems to be asking for a comprehensive documentation focused on the first part of a migration involving defining crews, tasks, and tools. Their reference indicates a YAML configuration or code for agents and tasks. Since they mentioned documentation and previously worked with agents.yaml and tasks.yaml, I'll need to focus on providing documentational tools while considering if the tasks are sequential or hierarchical, based on the crewai Process. I'll clarify whether YAML files or specific code examples are needed.
-
-
-**Searching CrewAI documentation**
-
-I need to search for how tasks and tools should be defined in the CrewAI documentation. I'll specifically look up "tasks" and "creating custom tools" on docs.crewai.com. Once I find relevant information, I'll generate agents.yaml and tasks.yaml for the documentation phase, keeping in mind the need for at least 10 citations. I’ll also use markdown formatting, including summaries and appropriate headings, to organize the content clearly and cite each key statement. Time is tight, but I’ll aim for accuracy while approximating where necessary!
-
-
-Thought for 15 seconds
-
 
 ## Summary
 

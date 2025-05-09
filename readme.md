@@ -5,3 +5,9 @@ switching to new language frameworks and incorporating security best practices.
 Once complete, the transformed code can be reviewed, complete with build and test results, 
 before accepting the changes.
 
+usage 
+
+python3 gen_docs.py temp_codebase/kitchensink/
+
+
+list the requirements to compile legacy and j21 code
