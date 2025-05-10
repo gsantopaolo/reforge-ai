@@ -1,74 +1,166 @@
 # tools/plan_tool.py
-from typing import Type, Optional, Any
+import yaml  # For YAML parsing
+from typing import Type, Dict, Optional, List, Any
 from pydantic import BaseModel, Field
 from crewai.tools import BaseTool
 from pathlib import Path
+from typing import Literal
 
-class ReadPlanInput(BaseModel):
-    """Input for reading the plan file. No parameters needed."""
+
+# Import the Plan and PlanStep models (assuming they are in a separate file or above)
+# If in the same file, they are already available.
+# from .plan_models import Plan, PlanStep
+# For simplicity, let's put them here for now:
+
+class PlanStep(BaseModel):
+    id: str = Field(..., description="Unique identifier for the plan step.")
+    name: str = Field(..., description="A short, descriptive name for the step.")
+    description: str = Field(..., description="A detailed description of what this step entails.")
+    status: Literal["todo", "done", "skipped", "failed", "rejected", "in_progress"] = Field(
+        default="todo",
+        description="The current status of the step."
+    )
+    notes: Optional[str] = Field(None,
+                                 description="Any notes, feedback, or reasons related to the current status or next actions.")
+
+
+class Plan(BaseModel):
+    steps: List[PlanStep] = Field(default_factory=list, description="The list of modernization steps.")
+
+
+# Input Schemas for Tool Actions (remain similar)
+class PlanToolGetNextStepInput(BaseModel):
     pass
 
-class WritePlanInput(BaseModel):
-    """Input for writing to the plan file."""
-    full_plan_content: str = Field(..., description="The complete new content for the plan file. The LLM must provide the entire updated plan.")
+
+class PlanToolGetStepDetailsInput(BaseModel):
+    step_id: str = Field(..., description="The unique identifier of the plan step.")
+
+
+class PlanToolUpdateStepStatusInput(BaseModel):
+    step_id: str = Field(..., description="The unique identifier of the plan step.")
+    new_status: Literal["todo", "done", "skipped", "failed", "rejected", "in_progress"] = Field(
+        ...,
+        description="The new status for the step."
+    )
+    notes: Optional[str] = Field(None, description="Optional notes to add or update for the step.")
+
 
 class PlanToolActionInput(BaseModel):
-    action: str = Field(..., description="The action to perform: 'read_plan' or 'write_plan'.")
-    content_to_write: Optional[str] = Field(None, description="The full content to write to the plan file (only for 'write_plan' action).")
+    action: str = Field(..., description="Action: 'get_next_step', 'get_step_details', 'update_step_status'.")
+    action_input: Optional[Dict[str, Any]] = Field(None, description="Inputs specific to the chosen action.")
+
 
 class PlanTool(BaseTool):
-    name: str = "PlanFileAccessTool"
+    name: str = "PlanTool"
     description: str = (
-        "Provides access to the modernization plan Markdown file. "
-        "It can read the entire content of the plan or overwrite the entire plan with new content. "
-        "The interpretation of the plan's content (e.g., finding next steps, updating status) "
-        "is handled by the LLM agent using this tool."
+        "Manages the modernization plan YAML file. "
+        "It can retrieve the next step to be done, get details of a specific step, "
+        "and update the status and notes for a step."
     )
     args_schema: Type[BaseModel] = PlanToolActionInput
-    plan_file_path: Path
 
-    def __init__(self, plan_file: str, **kwargs):
+    _plan_file_path_internal: Path
+
+    def __init__(self, plan_file: str, **kwargs: Any):
         super().__init__(**kwargs)
-        self.plan_file_path = Path(plan_file)
-        # No action-specific checks in __init__; those belong in the action methods.
+        self._plan_file_path_internal = Path(plan_file).resolve()
+        if not self._plan_file_path_internal.is_file():
+            # Allow creation if it doesn't exist, will be created on first write.
+            # Or raise error if it must exist:
+            # raise FileNotFoundError(f"PlanTool configured with non-existent plan file: {self._plan_file_path_internal}")
+            print(f"Warning: Plan file {self._plan_file_path_internal} not found. Will be created if written to.")
 
-    def _read_plan_content(self) -> str:
-        if not self.plan_file_path.is_file():
-            # If the intent is to read, but the file doesn't exist, this is an error.
-            return f"Error: Plan file not found at {self.plan_file_path}. Cannot read."
+    def _load_plan(self) -> Plan:
+        """Loads the plan from the YAML file."""
+        if not self._plan_file_path_internal.is_file():
+            return Plan(steps=[])  # Return an empty plan if file doesn't exist
         try:
-            with open(self.plan_file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            return content
+            with open(self._plan_file_path_internal, 'r', encoding='utf-8') as f:
+                data = yaml.safe_load(f)
+            if data and "steps" in data:  # Ensure basic structure
+                return Plan(**data)
+            return Plan(steps=[])  # Return empty plan if file is empty or malformed
+        except yaml.YAMLError as e:
+            print(f"Error parsing YAML plan file ({self._plan_file_path_internal}): {e}")
+            # Depending on desired robustness, either return empty plan or raise error
+            return Plan(steps=[])
         except Exception as e:
-            return f"Error reading plan file: {e}"
+            print(f"Unexpected error loading plan file ({self._plan_file_path_internal}): {e}")
+            return Plan(steps=[])
 
-    def _write_plan_content(self, new_content: str) -> str:
+    def _save_plan(self, plan: Plan) -> str:
+        """Saves the plan to the YAML file."""
         try:
-            # Ensure parent directory exists, useful if writing a new plan file.
-            self.plan_file_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.plan_file_path, 'w', encoding='utf-8') as f:
-                f.write(new_content)
-            return "Plan file updated successfully with new content."
+            # Ensure parent directory exists
+            self._plan_file_path_internal.parent.mkdir(parents=True, exist_ok=True)
+            with open(self._plan_file_path_internal, 'w', encoding='utf-8') as f:
+                # Pydantic's model_dump is useful here for clean serialization
+                yaml.dump(plan.model_dump(exclude_none=True), f, sort_keys=False, allow_unicode=True)
+            return "Plan file updated successfully."
         except Exception as e:
-            return f"Error writing to plan file: {e}"
+            return f"Error writing plan file ({self._plan_file_path_internal}): {e}"
+
+    def _get_next_step_to_do_logic(self) -> Optional[Dict[str, Any]]:
+        plan = self._load_plan()
+        for step in plan.steps:
+            if step.status == "todo":
+                return step.model_dump()  # Return as dict
+        return None
+
+    def _get_step_details_logic(self, step_id: str) -> Optional[Dict[str, Any]]:
+        plan = self._load_plan()
+        for step in plan.steps:
+            if step.id == step_id:
+                return step.model_dump()
+        return None
+
+    def _update_step_status_logic(self, step_id: str, new_status: str, notes: Optional[str] = None) -> str:
+        plan = self._load_plan()
+        step_found = False
+        for step in plan.steps:
+            if step.id == step_id:
+                step.status = new_status
+                if notes is not None:  # Allow clearing notes by passing empty string or explicitly setting new notes
+                    step.notes = notes
+                elif notes is None and new_status != step.status:  # If status changed and no notes provided, don't overwrite existing notes
+                    pass  # Keep existing notes
+                step_found = True
+                break
+
+        if not step_found:
+            return f"Error: Step with ID '{step_id}' not found in the plan."
+
+        return self._save_plan(plan)
 
     # ---- Methods for direct use by script (not via _run) ----
-    def read_plan(self) -> str:
-        """Script-callable version to read the entire plan."""
-        return self._read_plan_content()
+    def get_next_step_to_do(self) -> Optional[Dict[str, Any]]:
+        return self._get_next_step_to_do_logic()
 
-    def write_plan(self, new_content: str) -> str:
-        """Script-callable version to overwrite the entire plan."""
-        return self._write_plan_content(new_content)
+    def mark_step_as_done(self, step_id: str, notes: Optional[str] = "Completed by AI process.") -> str:
+        return self._update_step_status_logic(step_id, "done", notes)
+
+    def mark_step_as_todo(self, step_id: str, notes: str = "") -> str:
+        return self._update_step_status_logic(step_id, "todo", notes)
+
     # ---- End Script-callable methods ----
 
-    def _run(self, action: str, content_to_write: Optional[str] = None) -> str:
-        if action == "read_plan":
-            return self._read_plan_content()
-        elif action == "write_plan":
-            if content_to_write is None:
-                return "Error: 'content_to_write' is required for 'write_plan' action."
-            return self._write_plan_content(content_to_write)
+    def _run(self, action: str, action_input: Optional[Dict[str, Any]] = None) -> Any:
+        action_input = action_input or {}
+        if action == "get_next_step":
+            result = self._get_next_step_to_do_logic()
+            return result if result else "No 'todo' steps found."
+        elif action == "get_step_details":
+            if "step_id" not in action_input: return "Error: 'step_id' is required."
+            result = self._get_step_details_logic(action_input["step_id"])
+            return result if result else f"Step with ID '{action_input['step_id']}' not found."
+        elif action == "update_step_status":
+            if "step_id" not in action_input or "new_status" not in action_input:
+                return "Error: 'step_id' and 'new_status' are required."
+            return self._update_step_status_logic(
+                action_input["step_id"],
+                action_input["new_status"],
+                action_input.get("notes")  # notes are optional
+            )
         else:
-            return f"Error: Unknown action '{action}'. Valid actions are 'read_plan' or 'write_plan'."
+            return f"Error: Unknown action '{action}'. Valid: 'get_next_step', 'get_step_details', 'update_step_status'."

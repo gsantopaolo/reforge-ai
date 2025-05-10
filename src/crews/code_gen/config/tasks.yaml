@@ -1,49 +1,43 @@
-# Tasks for the Code Generation (gen_code) Crew for a single modernization plan step.
-# These tasks are orchestrated by the TeamLead (manager_llm).
+# src/crews/code_gen/config/tasks.yaml
+
+# src/crews/code_gen/config/tasks.yaml
 
 create_modernization_step_brief:
   description: >
-    For the current modernization plan step (identified by PlanTool using input 'current_plan_step_identifier'), 
-    thoroughly analyze all relevant `gen_docs` outputs, `kb_docs` artifacts, and the entire `kb_code` directory.
+    For the current modernization plan step (identified as '{current_plan_step_identifier}', 
+    previous feedback if any: '{retry_feedback_notes}'), 
+    thoroughly analyze all relevant information sources:
+    1. The **generated legacy application documentation** (accessible via CodeSearchTool with target '1-documentation/docs').
+    2. The **general knowledge base documents** (accessible via CodeSearchTool with target 'kb-docs').
+    3. The entire **code example knowledge base** (accessible via CodeSearchTool with target 'kb-code').
+    
     Synthesize these findings into a comprehensive "Modernization Step Brief".
-    This brief must clearly state the step's objectives, incorporate detailed analysis from `gen_docs`,
-    highlight best practices from `kb_docs`, and critically, provide specific code examples, warnings,
-    workarounds, and direct guidance from `kb_code`. Emphasize `kb_code` as the primary source of truth.
+    This brief must clearly state the step's objectives. 
+    It must incorporate detailed analysis from the **generated legacy application documentation** relevant to the current step.
+    It must highlight best practices from the **general knowledge base documents**.
+    And critically, it must provide specific code examples, warnings, workarounds, and direct guidance from the **code example knowledge base** ('kb-code'). 
+    Emphasize 'kb-code' as the primary source of truth for concrete implementation patterns.
   expected_output: >
     A detailed "Modernization Step Brief" document (string format) containing:
     1. Current plan step objectives.
-    2. Relevant analysis summary from `gen_docs`.
-    3. Applicable patterns from `kb_docs`.
-    4. Crucial code examples, solutions, and warnings from `kb_code`.
-    5. Clear guidance on how `kb_code` informs this specific step.
+    2. Relevant analysis summary from the generated legacy application documentation.
+    3. Applicable patterns from the general knowledge base documents.
+    4. Crucial code examples, solutions, and warnings from the code example knowledge base ('kb-code').
+    5. Clear guidance on how 'kb-code' informs this specific step.
   agent: software_architect
-  # 'current_plan_step_identifier' would be passed into the crew's kickoff method.
 
 implement_code_changes:
   description: >
-    Based on the provided "Modernization Step Brief", implement the required code transformations.
-    Utilize OpenRewriteTool for AST-based changes where specified or appropriate.
-    Write new Java 21 / Spring Boot code or modify existing code in the designated working directory.
+    Based on the provided "Modernization Step Brief" ({create_modernization_step_brief_task}), implement the required code transformations.
+    Write new Java 21 / Spring Boot code or modify existing code in the designated working directory ({working_code_path_for_this_step}).
     Ensure all code generation heavily references and adheres to the guidance, examples, and solutions
-    from `kb_code` as highlighted in the brief.
-  expected_output: >
-    1. Path to the working directory containing all modified and newly generated code.
-    2. A diff or patch file summarizing all code changes made during this task.
-  agent: principal_software_engineer
-  context: # Depends on the output of 'create_modernization_step_brief'
-    # The actual brief content will be passed as context by the TeamLead/manager.
-
-compile_modernized_code:
-  description: >
+    provided by the Software Architect as highlighted in the brief.
     Compile the modernized Java 21 / Spring Boot code located in the working directory 
-    (path provided from the 'implement_code_changes' task output). 
+    (path from 'implement_code_changes' task output: {implement_code_changes_task.changed_files_path}). 
     If the "Modernization Step Brief" or plan step specifies, also compile the legacy codebase 
-    using the LegacyCompilerTool for baseline or comparison.
+    (path: {legacy_code_path_for_this_step}) using the LegacyCompilerTool for baseline or comparison.
   expected_output: >
-    1. Build status for the modernized code (SUCCESS/FAILURE).
-    2. Compilation logs for the modernized code.
-    3. (If applicable) Build status for the legacy code.
-    4. (If applicable) Compilation logs for the legacy code.
-  agent: build_and_test_agent
-  context: # Depends on the output of 'implement_code_changes'
-    # The path to the code will be passed as context.
+    Code that compiles, if it not compile search for a solution based on the documents provided by the Software Architect.
+    If you can't find a solution there, serach the web.
+  agent: principal_software_engineer
+  human_input: true

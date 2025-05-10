@@ -1,4 +1,0 @@
-https://github.com/jboss-developer/jboss-eap-quickstarts
-
-
-python3 main.py temp_codebase/kitchensink

@@ -41,15 +41,15 @@ The following tools will be used by the agents: **PlanTool**, **FileSystemReadTo
 
 1.  Parse and understand the current modernization step from the plan using **PlanTool**.
 2.  Read and synthesize content from:
-    *   All relevant documents within `1-documentation/docs` (the extremely detailed outputs from the `gen_docs` phase, covering legacy system analysis, architecture, and component details).
-    *   All `kb_docs/*` artifacts (for general modernization best practices and broader context).
-    *   The entire `kb_code/*` directory (this is the curated set of findings, solutions, and code examples from the prior manual migration—*the migration “Bible”*).
+    *   All relevant documents within `1-documentation/docs` (the extremely detailed outputs from the `1-documentation/docs` phase, covering legacy system analysis, architecture, and component details).
+    *   All `kb-docs/*` artifacts (for general modernization best practices and broader context).
+    *   The entire `kb-code/*` directory (this is the curated set of findings, solutions, and code examples from the prior manual migration—*the migration “Bible”*).
 3.  Compile these insights into a **Modernization Step Brief**. This brief must include:
     *   Clear objectives for the current plan step.
-    *   Key discoveries and detailed analysis points extracted from the `gen_docs` outputs relevant to the current step.
-    *   Applicable best practices and patterns from `kb_docs`.
-    *   **Specific code examples, warnings, workarounds, and direct guidance from `kb_code`**, with clear citations or references.
-4.  Explicitly highlight where `kb_code` insights should override generic guidance or inform the interpretation of `gen_docs` outputs.
+    *   Key discoveries and detailed analysis points extracted from the `1-documentation/docs` outputs relevant to the current step.
+    *   Applicable best practices and patterns from `kb-docs`.
+    *   **Specific code examples, warnings, workarounds, and direct guidance from `kb-code`**, with clear citations or references.
+4.  Explicitly highlight where `kb-code` insights should override generic guidance or inform the interpretation of `1-documentation/docs` outputs.
 5.  Provide the "Modernization Step Brief" as authoritative context to the TeamLead and, through the TeamLead, to other downstream agents.
 6.  Optionally, monitor outputs from PrincipalSoftwareEngineer and BuildAndTestAgent (if delegation allows such feedback loops). If significant misalignment with the brief is detected or anticipated, the SoftwareArchitect can update the brief or provide corrective guidance to the TeamLead to re-task agents.
 7.  Upon successful completion of a step (signaled by TeamLead), prepare the brief for the next pending step in the plan.
