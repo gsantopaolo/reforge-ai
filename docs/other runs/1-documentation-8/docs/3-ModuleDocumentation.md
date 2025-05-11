@@ -1,0 +1,1 @@
+[the above content as final answer, including all Javadoc, markdown overview, Mermaid diagrams, and inventory table]

@@ -1,0 +1,89 @@
+# src/crews/code_gen/config/tasks.yaml
+
+create_modernization_step_brief:
+  description: >
+    Your primary objective is to prepare a "Modernization Step Brief" for codebase 'kitchensink'.
+    First, you **MUST** use '7-PlanPhasedModuleExtraction.yaml' in 'docs/' to understand all the phases
+    and the current one, status: 'current phase'
+    from the '7-PlanPhasedModuleExtraction.yaml' to understand what to do. If no 'current phase' step is found, state that clearly.
+
+    Assuming a 'current phase' step is found:
+    Based on the identified 'current_plan_step_identifier' and any 'retry_feedback_notes',
+    thoroughly analyze information from these sources (all paths relative to the temp base directory):
+    1.  'docs/' (Generated Legacy Application Documentation) using FileReadTool and/or MDXSearchTool.
+    2.  'kb-docs/' (General Knowledge Base Documents) using FileReadTool and/or MDXSearchTool.
+    3.  'kb-code/' (Code Example Knowledge Base) using FileReadTool and/or MDXSearchTool.
+    You **MUST** read all the docs in  `kb-code` and `kb-docs` and `docs` it is essential that you read and understand those docs really carefully
+    If you are not able to read each of the files in 'docs/', 'kb-docs/', 'kb-code/' 
+    you **MUST** clearly state it.
+    If you are able summarize them.
+    It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
+    Not being able to read all the documentation files it is a red flag that will lead all the modernization process to fail.
+    It is extremely important to read all those files and pass share the knowledge 
+    It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
+    It is **MANDATORY** that you make a list of the files you read and you compare with the result of DirectoryReadTool
+    to make sure you read all the docs
+    When you prepare your document, at the end you add a list of all the documents you read. This way 
+    a human can verify that you read all the very important document necessary for the phase
+    Synthesize your findings into the "Modernization Step Brief".
+    The brief MUST include the 'current_plan_step_identifier' it is for.
+    It must state the step's objectives (from the plan description you read).
+    It must incorporate analysis from source 'docs' relevant to this step.
+    It must highlight practices from 'kb-docs/'.
+    CRITICALLY, provide specifics from 'kb-code', emphasizing it for implementation.
+  expected_output: >
+    A detailed "Modernization Step Brief" string, including the 'current_plan_step_identifier' being addressed.
+    If no 'current phase' step was found, the output should clearly state "No actionable 'current phase' step found in the plan."
+  agent: software_architect
+  human_input: true
+
+implement_code_changes:
+  description: >
+    Working Directory for your changes:  'code'.
+    Based *solely* on the "Modernization Step Brief" provided above:
+    1. Implement the required code transformations in the specified working directory. 
+      This may involve writing new Java 21 / Spring Boot code, modifying existing Java code, 
+      and updating pom.xml files using your file system tools. 
+      Ensure all code generation heavily references the guidance from the brief.
+    2. After making changes, you MUST attempt to compile the entire multi-module project located in the 
+       working directory requesting the build_agent to build it using its tool. 
+    3. If the build_agent reports any compilation errors: 
+       - Analyze the errors. 
+       - Consult the brief 
+       - Ask the software_architect to get some more insight about the documentation and he can find something 
+         that may help to solve the issue.
+       - As last resort search the web using SerperDevTool and WebsiteSearchTool
+         for solutions. Attempt to fix the errors and re-compile. 
+         You may attempt this fix-and-compile cycle up to 10 times.
+    It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
+    It is **MANDATORY** that you make a list of the files you read and you compare with the result of DirectoryReadTool
+    to make sure you read all the docs
+    After your attempts (successful or not), present the following to the human for review:
+    Compilation Status, Compilation Logs, Summary of Changes Made, and the path to the changed files.
+    Then, ask the human for their decision: 'approve' or 'reject'.
+    If you get compile errors from the build tool, try too open all the files reported in the error and
+    pass to the LLM and try to understand where the problem is and find a fix.
+    You shall also use the
+    You now have the MavenBuildTool you build if it doesn't work you try to fix by asking to the software_architect
+    for infos, if he cannot provide anything meaningful you search the web
+    **Very Important** to create a new directory you need to use the FileWriterTool and create a dummy file in it
+    this is the only way you can create a folder
+  expected_output: >
+    New or changed code added to the repository, hopefully with a successful build.
+  agent: principal_software_engineer
+  human_input: true
+
+evaluate_solution:
+  description: >
+    After the principal_software_engineer’s changes (regardless of build success), collect:
+      1. Compilation Status
+      2. Full Compilation Logs
+      3. Summary of Changes Made
+      4. Paths to all modified/added files  
+    Present this package to the human for review and explicitly prompt for a decision of “approve” or “reject.”
+  expected_output: >
+    A human‐facing report containing the four items above and a clear “approve” or “reject” response.
+  agent: team_lead
+  human_input: true
+
+

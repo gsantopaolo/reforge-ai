@@ -1,0 +1,3 @@
+    It is **MANDATORY** that you understand that your base path is '/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code'
+    this is the location of your parent pom.xnl file. All the projects will be under this path '/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code'
+    Do not ever try to create, edit delete a file outside this path '/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code'

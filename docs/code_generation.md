@@ -33,9 +33,9 @@ The following tools will be used by the agents: **PlanTool**, **FileSystemReadTo
 
 ### 1.2 SoftwareArchitect
 
-**Role**: Context gathering, step validation, adaptive intervention, and guardian of `kb_code` wisdom.
+**Role**: Context gathering, step validation, adaptive intervention, and guardian of `kb-code` wisdom.
 
-**Goal**: Produce a comprehensive **Modernization Step Brief** for each modernization step. This brief integrates the detailed documentation from the `gen_docs` phase with the invaluable **`kb_code`** knowledge base—the definitive source of proven migration patterns, pitfalls, and solutions. Continuously monitor downstream work and intervene if code or process diverges from the brief or best practices.
+**Goal**: Produce a comprehensive **Modernization Step Brief** for each modernization step. This brief integrates the detailed documentation from the `kb-docs` phase with the invaluable **`kb-code`** knowledge base—the definitive source of proven migration patterns, pitfalls, and solutions. Continuously monitor downstream work and intervene if code or process diverges from the brief or best practices.
 
 **Responsibilities**:
 
@@ -70,10 +70,10 @@ The following tools will be used by the agents: **PlanTool**, **FileSystemReadTo
 
 **Responsibilities**:
 
-1.  Ingest the **Modernization Step Brief** (which includes detailed legacy analysis synthesized by the SoftwareArchitect and critical `kb_code` guidance).
-2.  Apply Abstract Syntax Tree (AST)-based rewrites using **OpenRewriteTool** where applicable, guided by patterns identified in the brief (potentially derived from `kb_code`).
+1.  Ingest the **Modernization Step Brief** (which includes detailed legacy analysis synthesized by the SoftwareArchitect and critical `kb-code` guidance).
+2.  Apply Abstract Syntax Tree (AST)-based rewrites using **OpenRewriteTool** where applicable, guided by patterns identified in the brief (potentially derived from `kb-code`).
 3.  Write new Java 21 / Spring Boot code (services, controllers, repositories, configurations, etc.) or modify existing code in a designated working directory using **FileSystemReadWriteTool**. The agent will leverage its underlying LLM and the rich context from the brief (especially `kb_code` examples) to generate accurate and idiomatic code.
-4.  Ensure generated code adheres to idiomatic Spring Boot patterns, heavily referencing examples and solutions highlighted from `kb_code` in the brief.
+4.  Ensure generated code adheres to idiomatic Spring Boot patterns, heavily referencing examples and solutions highlighted from `kb-code` in the brief.
 5.  Produce a diff or patch file of the changes made for review by the TeamLead and SoftwareArchitect.
 
 **Tools Injected**:

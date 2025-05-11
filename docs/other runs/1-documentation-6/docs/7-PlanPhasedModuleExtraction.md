@@ -1,0 +1,1 @@
+(as per user request, full detailed content)

@@ -71,6 +71,7 @@ class JDepsTool(BaseTool):
         real_base = base_path or self._base_path
         # Resolve to actual class directory or JAR
         # target = resolve_target_path(real_base)
+        # todo: hardcoded path
         target = resolve_target_path("/Users/gp/Developer/java-samples/reforge-ai/src/temp_codebase/")
 
 

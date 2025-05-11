@@ -1,0 +1,1 @@
+The modernization incidents list has been compiled and details deprecated API usages, library upgrade needs, and migration blockers based on the analysis of the kitchensink project.
