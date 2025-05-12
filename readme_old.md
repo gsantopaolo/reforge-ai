@@ -31,9 +31,9 @@ list the requirements to compile legacy and j21 code
       - https://app.langtrace.ai/project/cmadwbajj0007yfqm1yefsv96/traces
       - https://serper.dev/dashboard
     - Build agent powerd with llm was allucinating, simulating a maven build output!!!!
-- human feedback is extremly important
+- human feedback is extremely important
   - see the feedback in gen moder tasks.xml
-    - feedbackj to see if the model read all the docs
+    - feedback to see if the model read all the docs
     - feedback to see if the agent did the right changes
   - in docs there shall be a feedback for each doc, not in this evr for simplicity
 - guardrails for paths 
@@ -41,7 +41,7 @@ list the requirements to compile legacy and j21 code
 - 4.1mini was not able to make any succesfull build I had to switch to 4.1
 - sometimes in gen moder it was refusing to read, i guess the llm chosen the wrong tool
   no matter what feedback i gave it was not abe to read. Restartin made it works
-- gen moder, sometimes it makes sometimes it doesn't make it 
+- gen mode, sometimes it makes sometimes it doesn't make it 
 - manualy delete folder since agent does not have the capability to delete folders
 
 

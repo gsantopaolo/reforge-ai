@@ -127,6 +127,7 @@ To compile and run both the legacy (`gen_docs.py`) and modern (`gen_modern.py`) 
 
 ## ⚠️ Known Issues & Troubleshooting
 
+* **Some hardcoded paths**: This version has some hardcoded paths, you need to manually change them to make the app run on your local pc. 
 * **Inconsistent Model Outputs**: Running `gen_docs.py` multiple times may yield different results. Models may degrade under heavy usage.
 * **Build Agent Hallucinations**: Simulated build logs can be inaccurate. Monitor via Langtrace: [Traces Dashboard](https://app.langtrace.ai/project/cmadwbajj0007yfqm1yefsv96/traces)
 * **Agent Tools Errors**: Sometimes the LLm refuses to read docs due to tool selection issues. Restarting the pipeline often helps.
