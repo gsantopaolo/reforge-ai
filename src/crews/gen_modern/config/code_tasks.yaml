@@ -1,42 +1,4 @@
 # src/crews/code_gen/config/tasks.yaml
-
-create_modernization_step_brief:
-  description: >
-    Your primary objective is to prepare a "Modernization Step Brief" for codebase 'kitchensink'.
-    First, you **MUST** use '7-PlanPhasedModuleExtraction.yaml' in 'docs/' to understand all the phases
-    and the current one, status: 'current phase'
-    from the '7-PlanPhasedModuleExtraction.yaml' to understand what to do. If no 'current phase' step is found, state that clearly.
-
-    Assuming a 'current phase' step is found:
-    Based on the identified 'current_plan_step_identifier' and any 'retry_feedback_notes',
-    thoroughly analyze information from these sources (all paths relative to the temp base directory):
-    1.  'docs/' (Generated Legacy Application Documentation) using FileReadTool and/or MDXSearchTool.
-    2.  'kb-docs/' (General Knowledge Base Documents) using FileReadTool and/or MDXSearchTool.
-    3.  'kb-code/' (Code Example Knowledge Base) using FileReadTool and/or MDXSearchTool.
-    You **MUST** read all the docs in  `kb-code` and `kb-docs` and `docs` it is essential that you read and understand those docs really carefully
-    If you are not able to read each of the files in 'docs/', 'kb-docs/', 'kb-code/' 
-    you **MUST** clearly state it.
-    If you are able summarize them.
-    It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
-    Not being able to read all the documentation files it is a red flag that will lead all the modernization process to fail.
-    It is extremely important to read all those files and pass share the knowledge 
-    It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
-    It is **MANDATORY** that you make a list of the files you read and you compare with the result of DirectoryReadTool
-    to make sure you read all the docs
-    When you prepare your document, at the end you add a list of all the documents you read. This way 
-    a human can verify that you read all the very important document necessary for the phase
-    Synthesize your findings into the "Modernization Step Brief".
-    The brief MUST include the 'current_plan_step_identifier' it is for.
-    It must state the step's objectives (from the plan description you read).
-    It must incorporate analysis from source 'docs' relevant to this step.
-    It must highlight practices from 'kb-docs/'.
-    CRITICALLY, provide specifics from 'kb-code', emphasizing it for implementation.
-  expected_output: >
-    A detailed "Modernization Step Brief" string, including the 'current_plan_step_identifier' being addressed.
-    If no 'current phase' step was found, the output should clearly state "No actionable 'current phase' step found in the plan."
-  agent: software_architect
-  human_input: true
-
 implement_code_changes:
   description: >
     Working Directory for your changes:  'code'.

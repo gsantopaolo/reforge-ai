@@ -51,8 +51,8 @@ class GenModernCrew:
     DocumentationCrew: auto-generates comprehensive docs
     for a legacy Java 10 banking system moving to Java 21.
     """
-    agents_config = 'config/agents.yaml'
-    tasks_config = 'config/tasks.yaml'
+    agents_config = 'config/docs_agents.yaml'
+    tasks_config = 'config/docs_tasks.yaml'
     agents: Any
     agents_config: Any
     tasks_config: Any
@@ -65,13 +65,6 @@ class GenModernCrew:
         # cache for tools
         always_cache       = lambda args, result: True
 
-        # code dir and file tool
-        self._code_dir_tool     = DirectoryReadTool(directory=self.codebase_path)
-        # todo: hardcoded path!
-        # self._code_dir_tool = DirectoryReadTool("/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work")
-        # self._code_dir_tool.cache_function = always_cache
-        self._code_file_tool    = FileReadTool()
-        # self._code_file_tool.cache_function = always_cache
 
         # kb dir and file tool
         self._kb_dir_tool = DirectoryReadTool(directory=self.kb_path)
@@ -127,42 +120,6 @@ class GenModernCrew:
             max_iter=cfg.get('max_iter', 25)
         )
 
-    @agent
-    def principal_software_engineer(self) -> Agent:
-        cfg = self.agents_config['principal_software_engineer']
-        tools = [
-            self._code_dir_tool,
-            self._code_file_tool,
-            FileWriterTool(),
-            MavenBuildTool(),
-            SerperDevTool(),
-            # MDXSearchTool(),
-            # WebsiteSearchTool(),
-            *self.fs_tools
-        ]
-        return Agent(
-            config=cfg,
-            tools=tools,
-            llm=self.llm,
-            verbose=True,  # cfg.get('verbose', True),
-            # allow_delegation=cfg.get('allow_delegation', True)
-            allow_delegation=False,
-            max_iter=cfg.get('max_iter', 25)
-        )
-
-    @agent
-    def build_agent(self) -> Agent:
-        cfg = self.agents_config['build_agent']
-        tools = [
-            MavenBuildTool(),
-        ]
-        return Agent(
-            config=cfg,
-            tools=tools,
-            verbose=True,
-            allow_delegation=False
-        )
-
     # ────────── Tasks ──────────
     @task
     def create_modernization_step_brief_task(self) -> Task:
@@ -171,29 +128,7 @@ class GenModernCrew:
             agent=self.software_architect()
         )
 
-    @task
-    def implement_code_changes_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['implement_code_changes'],
-            agent=self.principal_software_engineer(),
-            context=[self.create_modernization_step_brief_task()]
-        )
 
-    @task
-    def build_solution_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['build_solution'],
-            agent=self.build_agent(),
-            context=[self.implement_code_changes_task()]
-        )
-
-    @task
-    def evaluate_solution_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['evaluate_solution'],
-            agent=self.team_lead(),
-            context=[self.build_solution_task()]
-        )
 
     # ────────── Crew ──────────
     @crew
@@ -208,8 +143,11 @@ class GenModernCrew:
             manager_agent=manager,
             manager_llm=llm_client,
             planning=True,
-            verbose=True
+            verbose=True,
+            memory = True,
+            long_term_memory = LongTermMemory(
+                storage=LTMSQLiteStorage(db_path="./modernization_memory.db")
+        ),
         )
 
 
-'/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/kb/docs/7-PlanPhasedModuleExtraction.yaml'

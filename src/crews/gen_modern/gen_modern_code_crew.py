@@ -73,11 +73,6 @@ class GenModernCrew:
         self._code_file_tool    = FileReadTool()
         # self._code_file_tool.cache_function = always_cache
 
-        # kb dir and file tool
-        self._kb_dir_tool = DirectoryReadTool(directory=self.kb_path)
-        # self._kb_dir_tool.cache_function = always_cache
-        self._kb_file_tool = FileReadTool()
-        # self._kb_file_tool.cache_function = always_cache
 
         self.llm = llm_client
 
@@ -164,19 +159,14 @@ class GenModernCrew:
         )
 
     # ────────── Tasks ──────────
-    @task
-    def create_modernization_step_brief_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['create_modernization_step_brief'],
-            agent=self.software_architect()
-        )
+
 
     @task
     def implement_code_changes_task(self) -> Task:
         return Task(
             config=self.tasks_config['implement_code_changes'],
             agent=self.principal_software_engineer(),
-            context=[self.create_modernization_step_brief_task()]
+            # context=[self.create_modernization_step_brief_task()]
         )
 
     @task
@@ -197,7 +187,7 @@ class GenModernCrew:
 
     # ────────── Crew ──────────
     @crew
-    def crew(self) -> Crew:
+    def gen_code_crew(self) -> Crew:
         manager = self.team_lead()
         operational_agents = [a for a in self.agents if a is not manager]
         return Crew(
@@ -208,7 +198,11 @@ class GenModernCrew:
             manager_agent=manager,
             manager_llm=llm_client,
             planning=True,
-            verbose=True
+            verbose=True,
+            memory=True,
+            long_term_memory=LongTermMemory(
+                storage=LTMSQLiteStorage(db_path="./modernization_memory.db")
+            ),
         )
 
 

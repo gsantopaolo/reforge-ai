@@ -68,13 +68,13 @@ steps:
       1. Read all the docs in  `kb-code` and `kb-docs` and `docs` it is essential that you read and understand those docs really carefully
          It is **MANDATORY** that when you try to open a file for read or write a file you use the full path as provided by the DirectoryReadTool
       2. Create the `kitchensink-business` module directory structure:
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/pom.xml`
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/src/main/java/com/example/kitchensink/business/model/Member.java`
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/src/main/java/com/example/kitchensink/business/repo/MemberRepository.java`
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/src/main/java/com/example/kitchensink/business/service/MemberRegistration.java`
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/src/main/java/com/example/kitchensink/business/event/MemberRegisteredEvent.java`
-         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/src/main/resources/META-INF/beans.xml` (if needed for CDI in a library, or rely on Spring's component scan).
-      3. Populate `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/kitchensink-business/pom.xml`:
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/pom.xml`
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/src/main/java/com/example/kitchensink/business/model/Member.java`
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/src/main/java/com/example/kitchensink/business/repo/MemberRepository.java`
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/src/main/java/com/example/kitchensink/business/service/MemberRegistration.java`
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/src/main/java/com/example/kitchensink/business/event/MemberRegisteredEvent.java`
+         `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/src/main/resources/META-INF/beans.xml` (if needed for CDI in a library, or rely on Spring's component scan).
+      3. Populate `/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code/kitchensink-business/pom.xml`:
          - Inherit from parent aggregator.
          - Set artifactId `kitchensink-business`, packaging `jar`.
          - Add `spring-boot-starter-data-jpa` dependency (this brings in Spring context, JPA API, Hibernate, etc.).

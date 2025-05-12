@@ -1,66 +1,75 @@
-
 ## Summary
 
-We’ll stand up an initial **CrewAI Crew** dedicated solely to creating a full, comprehensive documentation of the legacy Java 10 banking system—before any code migration begins. The crew will consist of specialized agents (Project Manager, Codebase Analyst, Documentation Specialist, Reviewer) working in a **sequential** workflow, since each documentation phase builds on the previous one (inventory → analysis → writing → review) . We’ll provision a set of **custom tools** (e.g. StaticAnalyzerTool, DiagramGeneratorTool) so agents can introspect code, extract schemas, and produce diagrams without writing implementations now—just naming and describing their function ([docs.crewai.com][1]). Each **task** is bound to exactly one responsible agent, and every task also designates a reviewer agent to enforce quality and request refinements, mirroring peer-review best practices in software documentation .
+The **DocumentationCrew** is an **agentic AI system** that autonomously:
+
+1. **Analyzes** an existing codebase using static analysis and dependency discovery.
+2. **Generates** a detailed transformation plan, mapping legacy constructs to modern equivalents.
+3. **Executes** the plan by updating package dependencies, refactoring deprecated or inefficient code, switching to new frameworks, and incorporating security best practices.
+
+This system leverages both **custom tools** and **CrewAI-built utilities** to ensure a robust, end-to-end modernization workflow.
 
 ---
 
 ## 1. Crew Definition
 
-We’ll create a single Crew, named **DocumentationCrew**, with a **sequential** process (tasks run one after another) to guarantee that module docs only start once the inventory and analysis are complete . The crew comprises the following agents:
+We define a **hierarchical** process managed by a central orchestrator. The crew comprises five specialized agents:
 
-| Agent ID                     | Role                           | Goal                                                                                                                   | Tools                                    | LLM Usage                  |
-| ---------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------- |
-| **project\_manager\_agent**  | Project Manager & Orchestrator | Kick off the documentation initiative, scaffold the knowledge base, prioritize modules, and sequence tasks.            | KnowledgeBaseTool, SchedulingTool        | Minimal (status summaries) |
-| **codebase\_analyst\_agent** | Codebase Analyst               | Perform inventory and static code analysis: map modules, dependencies, detect Java 10-specific constructs to document. | StaticAnalyzerTool, DependencyMapperTool | None                       |
-| **documentation\_agent**     | Documentation Specialist       | Generate Javadoc enhancements, module overviews, data-model docs, SQL/SP summaries, and architecture narratives.       | CodeParserTool, RetrievalTool            | High (GPT-4)               |
-| **reviewer\_agent**          | Quality Reviewer & Critic      | Audit all outputs—reports, diagrams, prose—for accuracy, completeness, and clarity; request refinements as needed.     | DiffAnalyzerTool, LLMDiagnosticTool      | Moderate (critique)        |
-
-*Crew composition follows the CrewAI “specialized agent” pattern: each agent has a clear role, goal, and restricted toolset to ensure predictable collaboration* .
+| Agent ID                     | Role                                              | Goal                                                                                                                                                     |
+| ---------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **project\_manager\_agent**  | Strategic Orchestrator and Governance Agent       | Coordinate all phases, prioritize modules by business value, maintain the knowledge base, schedule tasks, and audit outputs against quality gates.       |
+| **codebase\_analyst\_agent** | Technical Investigator and Dependency Mapper      | Perform exhaustive static analysis and dependency mapping: index files, detect deprecated APIs, and build a detailed modernization incidents report.     |
+| **documentation\_agent**     | Knowledge Synthesizer and Narrative Architect     | Transform code insights into human-readable artifacts: auto-generate Javadoc, high-level overviews, and Mermaid diagrams for architecture and flows.     |
+| **domain\_expert\_agent**    | Compliance Validator and Business-Rule Consultant | Validate documentation against banking regulations and business workflows; deliver compliance reports and flag issues per Basel III and ISO 20022.       |
+| **migration\_agent**         | Migration Strategist and Architecture Integrator  | Consolidate docs into a phased migration roadmap: map legacy to Java 21/Spring Boot, assess risks, and plan incremental extraction using best practices. |
 
 ---
 
 ## 2. Tools Catalog
 
-Below are the **custom tools** we’ll declare (implementation TBD). Agents will invoke these to inspect the codebase and generate artifacts:
+This implementation declares the following tools:
 
-| Tool Name                 | Description                                                                                                                  |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **StaticAnalyzerTool**    | Scans Java source for deprecated APIs, code smells, and constructs removed in Java 11–21.                                    |
-| **DependencyMapperTool**  | Reads Maven/Gradle metadata to list all external libraries, versions, and inter-module dependencies.                         |
-| **CodeParserTool**        | Parses Java ASTs to extract class/method signatures, call graphs, and package hierarchies.                                   |
-| **DiagramGeneratorTool**  | Renders UML diagrams (class, package, sequence) from AST or metadata to visualize architecture.                              |
-| **DBSchemaExtractorTool** | Connects to the database or reads SQL files to output ER diagrams, table schemas, and stored procedure catalogs.             |
-| **RiskAssessmentTool**    | Cross-references inventory data against known Java 21 deprecations and regulatory checklists (e.g. PCI, GDPR) to flag risks. |
-| **KnowledgeBaseTool**     | Reads/writes to a markdown/wiki repository for storing generated docs and metadata.                                          |
-| **RetrievalTool**         | Performs semantic lookup over existing docs or code using embeddings to provide context during writing.                      |
-| **DiffAnalyzerTool**      | Compares two versions of a document or code diff to highlight inconsistencies or missing updates.                            |
-| **LLMDiagnosticTool**     | Uses an LLM to critique prose or diagram captions for clarity, correctness, and completeness.                                |
+| Tool Name                | Source                    | Description                                                                                                               |
+| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **CodeParserTool**       | `tools/code_parser`       | Parses source files into an AST, extracts class/method signatures, and builds a file‐level index.                         |
+| **DependencyMapperTool** | `tools/dependency_mapper` | Reads Maven/Gradle metadata and JAR analysis (via `jdeps`) to map external libraries, inter-module links, and versioning. |
+| **JDepsTool**            | `tools/jdeps_tool`        | A wrapper around the `jdeps` CLI for deep dependency inspection of Java artifacts.                                        |
+| **SerperDevTool**        | `crewai_tools`            | Internet search utility for retrieving migration best practices, case studies, and external references.                   |
+| **DirectoryReadTool**    | `crewai_tools`            | Recursively reads directory structures to locate source directories and resources.                                        |
+| **FileReadTool**         | `crewai_tools`            | Reads file contents (code, configs, docs) for downstream processing by other agents.                                      |
 
-*Defining custom tools via `BaseTool` subclasses is standard practice in CrewAI; this ensures agents can call them by name and adhere to a shared API contract* ([docs.crewai.com][1]).
+*Note: Additional tools (e.g., AST-based refactoring, DiffAnalyzer, RiskAssessment) can be integrated as needed.*
 
 ---
 
 ## 3. Task Breakdown
 
-We’ll sequence the following tasks under **Process.sequential**, each with a designated owner and reviewer:
+Tasks are defined in `tasks.yaml` and executed by the responsible agent in a **hierarchical** workflow:
 
-| Task ID                       | Description                                                                                                                                            | Responsible Agent        | Reviewer Agent          | Tools                                            |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ | ----------------------- | ------------------------------------------------ |
-| **initialize\_kb**            | Scaffold the documentation repository/wiki: create top-level sections for architecture, modules, data model, SQL/SP, and risk registers.               | project\_manager\_agent  | reviewer\_agent         | KnowledgeBaseTool, SchedulingTool                |
-| **inventory\_codebase**       | Traverse the code repository to catalog all packages, modules, and external dependencies; tag high-impact modules by size/commit history.              | codebase\_analyst\_agent | reviewer\_agent         | StaticAnalyzerTool, DependencyMapperTool         |
-| **extract\_architecture**     | Generate an overall system architecture diagram and narrative: show module interactions, deployment topology, and data flows.                          | codebase\_analyst\_agent | reviewer\_agent         | DiagramGeneratorTool, CodeParserTool             |
-| **extract\_data\_model**      | Produce ER diagrams and table schemas for all database objects, and document core stored procedures and triggers.                                      | codebase\_analyst\_agent | reviewer\_agent         | DBSchemaExtractorTool, DiagramGeneratorTool      |
-| **generate\_module\_docs**    | For each key module, auto-generate Javadoc comments, class/method summaries, and a human-readable module overview.                                     | documentation\_agent     | reviewer\_agent         | CodeParserTool, RetrievalTool, LLMDiagnosticTool |
-| **generate\_sql\_sp\_docs**   | Summarize each stored procedure: inputs, outputs, business purpose, and performance considerations in plain English.                                   | documentation\_agent     | reviewer\_agent         | DBSchemaExtractorTool, LLMDiagnosticTool         |
-| **compile\_risk\_report**     | Cross-reference deprecated API findings and schema changes to create a **Migration Risk Analysis** document with mitigation recommendations.           | documentation\_agent     | reviewer\_agent         | RiskAssessmentTool, StaticAnalyzerTool           |
-| **review\_and\_refine\_docs** | Perform a holistic review of all generated artifacts, normalize formatting, ensure cross-references are correct, and finalize style consistency.       | reviewer\_agent          | project\_manager\_agent | DiffAnalyzerTool, LLMDiagnosticTool              |
-| **finalize\_doc\_handbook**   | Publish the consolidated **Documentation Handbook** (PDF/markdown site), complete with TOC, versioning info, and handoff notes for the migration team. | project\_manager\_agent  | reviewer\_agent         | KnowledgeBaseTool                                |
-
-All tasks proceed in strict order—no document is created until its inputs exist—maximizing clarity and traceability . Each task’s **reviewer** provides immediate feedback; if the responsible agent’s output falls short, the reviewer will request a rerun or refinement, ensuring the final documentation meets high professional standards (akin to human technical reviews) .
+| Task ID                                  | Description                                                                                                                                          | Responsible Agent        | Human Input Required |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | -------------------- |
+| **extract\_file\_metadata**              | Parse each Java file to extract package declarations, class/interface names, and module affiliations; build a file‐level index with error summaries. | codebase\_analyst\_agent | No                   |
+| **generate\_system\_architecture**       | Produce high-level system architecture diagrams (Mermaid) and narrative describing module hierarchies and interactions.                              | documentation\_agent     | No                   |
+| **generate\_module\_docs**               | For each key module: enhance Javadoc, write overviews, and generate Mermaid class/sequence diagrams.                                                 | documentation\_agent     | No                   |
+| **component\_technology\_inventory**     | Enumerate all components, libraries, and frameworks; research migration pathways to Spring Boot on Java 21 and compile best-practice references.     | codebase\_analyst\_agent | No                   |
+| **research\_migration\_best\_practices** | Summarize web-sourced best practices for migrating Java EE/JBoss → Spring Boot on Java 21.                                                           | domain\_expert\_agent    | No                   |
+| **impact\_analysis\_on\_java21**         | Map legacy namespaces and APIs to Java 21/Spring Boot equivalents; assess migration risks and register severity levels.                              | migration\_agent         | No                   |
+| **plan\_phased\_module\_extraction**     | Identify least-coupled modules; create a stepwise extraction plan with detailed AI-action paragraphs and coexistence strategies (YAML inside MD).    | migration\_agent         | Yes                  |
+| **plan\_migration\_roadmap**             | Review all docs; prioritize refactoring tasks, group into phases (e.g., logging, date/time APIs), and schedule with human review checkpoints.        | migration\_agent         | Yes                  |
+| **final\_handover\_and\_summary**        | Consolidate outputs into an executive report; highlight completed phases, mitigations, improvements, and next steps (optional slide deck).           | migration\_agent         | No                   |
 
 ---
 
-With this crew, task list, and tool catalog in place, you can implement `agents.yaml`, `tasks.yaml`, and the corresponding `crew.py`/`main.py` to spin up your **DocumentationCrew** in CrewAI, ready to autonomously generate the exhaustive documentation you need before any code migration begins.
+## 4. Workflow Diagram
 
-[1]: https://docs.crewai.com/how-to/create-custom-tools "Create Custom Tools - CrewAI"
+```mermaid
+flowchart LR
+  A[Load Codebase] --> B[Static Analysis & Dependency Mapping]
+  B --> C[Metadata Extraction & Indexing]
+  C --> D[Generate Architecture & Module Docs]
+  D --> E[Research Migration Practices]
+  E --> F[Impact Analysis & Risk Assessment]
+  F --> G[Plan & Execute Phased Extraction]
+  G --> H[Refactor Code & Update Dependencies]
+  H --> I[Incorporate Security Best Practices]
+  I --> J[Produce Final Documentation & Reports]
+```

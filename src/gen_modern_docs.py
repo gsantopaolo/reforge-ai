@@ -7,7 +7,7 @@ from langtrace_python_sdk import langtrace
 langtrace.init(api_key=os.getenv("LANGTRACE_API_KEY"))
 
 from sympy.codegen.ast import Raise
-from crews.gen_modern.gen_modern_crew import GenModernCrew
+from crews.gen_modern.gen_modern_docs_crew import GenModernCrew
 
 # Hardcoded paths
 codebase_path = "/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code"

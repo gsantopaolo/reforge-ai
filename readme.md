@@ -42,3 +42,4 @@ list the requirements to compile legacy and j21 code
 - sometimes in gen moder it was refusing to read, i guess the llm chosen the wrong tool
   no matter what feedback i gave it was not abe to read. Restartin made it works
 - gen moder, sometimes it makes sometimes it doesn't make it 
+- manualy delete folder since agent does not have the capability to delete folders
