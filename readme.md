@@ -146,7 +146,6 @@ For the complete list of improvements/next steps, read:
 - [Documentation Generation Improvement Suggestions](https://github.com/gsantopaolo/reforge-ai/blob/main/docs/documentation_improvements.md)
 ---
 
----
 
 ## 📚 References
 - [MongoDB Launches New Program for Enterprises to Build Modern Applications with Advanced Generative AI Capabilities](https://www.mongodb.com/press/mongodb-launches-new-program-for-enterprises-to-build-modern-applications-with-advanced-generative-ai-capabilities) 
