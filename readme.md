@@ -146,4 +146,21 @@ For the complete list of improvements/next steps, read:
 - [Documentation Generation Improvement Suggestions](https://github.com/gsantopaolo/reforge-ai/blob/main/docs/documentation_improvements.md)
 ---
 
+---
 
+## 📚 References
+- [MongoDB Launches New Program for Enterprises to Build Modern Applications with Advanced Generative AI Capabilities](https://www.mongodb.com/press/mongodb-launches-new-program-for-enterprises-to-build-modern-applications-with-advanced-generative-ai-capabilities) :contentReference[oaicite:0]{index=0}
+- [Leveraging Large Language Models for Automated Code Migration and Repository-Level Tasks — Part II: Supplement — Specialized Language Models for Code](https://medium.com/@jelkhoury880/leveraging-large-language-models-for-automated-code-migration-and-repository-level-tasks-part-ii-24d23c3cc7a0) :contentReference[oaicite:1]{index=1}
+- [Upgrading Java versions with Amazon Q Developer](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-transformation.html) :contentReference[oaicite:2]{index=2}
+- [Generative AI in application modernization](https://www.ibm.com/think/topics/generative-ai-for-application-modernization) :contentReference[oaicite:3]{index=3}
+- [Generative AI: A Transformative Force in Legacy App Modernization](https://www.nttdata.com/global/en/insights/focus/2025/generative-ai-a-transformative-force-in-legacy-app-modernization) :contentReference[oaicite:4]{index=4}
+- [The Unreasonable Effectiveness of Generative AI in Legacy Application Modernization](https://medium.com/@adnanmasood/the-unreasonable-effectiveness-of-generative-ai-in-legacy-application-modernization-0e81d294f894) :contentReference[oaicite:5]{index=5}
+- [Application Modernization | MongoDB](https://www.mongodb.com/resources/solutions/use-cases/application-modernization) :contentReference[oaicite:6]{index=6}
+- [Why General-Purpose LLMs Won’t Modernize Your Codebase — And What Will](https://medium.com/@jelkhoury880/why-general-purpose-llms-wont-modernize-your-codebase-and-what-will-eaf768481d38)
+- [Modernizing Legacy Java Applications — Best Practices and Considerations](https://medium.com/@AlexanderObregon/modernizing-legacy-java-applications-best-practices-and-considerations-a01b3b52ee7a)
+- [janus-llm/janus-llm: Leveraging LLMs for modernization through intelligent chunking, iterative prompting and reflection, and retrieval augmented generation (RAG)](https://github.com/janus-llm/janus-llm)
+- [spring-projects-experimental/spring-boot-migrator: Spring Boot Migrator (SBM) is a tool for automated code migrations to upgrade or migrate to Spring Boot](https://github.com/spring-projects-experimental/spring-boot-migrator)
+- [This Year in Uber's AI-Driven Developer Productivity Revolution](https://www.youtube.com/watch?v=jp-fBw07r7c)  
+
+
+---
