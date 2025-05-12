@@ -1,29 +1,32 @@
 ## Documentation Pipeline Analysis
 
-This document provides a detailed technical analysis of the **DocumentationPipeline**, which is implemented by `gen_docs.py` orchestrating the `DocumentationCrew` defined in `documentation_crew.py`, using the configurations in `agents.yaml` and `tasks.yaml`.
+This document provides an in-depth technical analysis of the **DocumentationPipeline**, comprising the `gen_docs.py` entry-point orchestrating the `DocumentationCrew` defined in `documentation_crew.py`, with configurations sourced from `agents.yaml` and `tasks.yaml`.
 
 ---
 
-### 1. gen\_docs.py: Pipeline Entry Point
+### 1. `gen_docs.py`: Pipeline Entry Point
 
-`gen_docs.py` is the CLI bootstrap script for the documentation pipeline:
+The `gen_docs.py` script (alias `src/main.py`) bootstraps the pipeline via a simple CLI:
 
 ```bash
 $ python3 gen_docs.py <path_to_codebase_or_git_url>
 ```
 
-1. **prepare\_codebase**: Clones or copies the target code repository into a local folder and sets `CODE_PATH`.
-2. **Directory Setup**:
+1. **prepare\_codebase**: Clones or copies the target repository, returning a local `codebase_path` and setting `CODE_PATH`.
+2. **Environment Setup**:
 
-   * Creates `1-documentation/docs` for generated Markdown files.
-   * Creates `1-documentation/state` for storing pipeline state.
-   * Uses `kb-docs` as the knowledge base directory for intermediate artifacts.
+   * Reads `LLM_PROVIDER` from the environment and logs the active GenAI provider.
+   * Defines directories:
+
+     * `1-documentation/docs`: Markdown outputs
+     * `1-documentation/state`: JSON state snapshots
+     * `kb-docs`: Knowledge-base artifacts
 3. **Crew Instantiation**:
 
    ```python
    crew = DocumentationCrew(codebase_path, docs_dir, kb_dir).crew()
    ```
-4. **Kickoff**:
+4. **Pipeline Kickoff**:
 
    ```python
    state = crew.kickoff({
@@ -33,79 +36,57 @@ $ python3 gen_docs.py <path_to_codebase_or_git_url>
      "kb_path": os.path.basename(kb_dir)
    })
    ```
-5. **Persist State**: Writes pipeline state to `1-documentation/state/documentation_state.json`.
+5. **State Persistence**: Serializes the returned state model to `1-documentation/state/documentation_state.json`.
+6. **Completion**: Logs success and points to generated docs and state.
 
 ---
 
-### 2. DocumentationCrew Class Structure
+### 2. `DocumentationCrew`: Core Class Structure
 
-`documentation_crew.py` defines the `DocumentationCrew` class, which extends `CrewBase` and wires together agents and tasks:
+The `DocumentationCrew` (in `crews.documentation.documentation_crew`) extends `CrewBase`, wiring together agents, tools, and tasks:
 
 ```mermaid
 classDiagram
-    class DocumentationCrew {
-        +agents_config: str = 'config/agents.yaml'
-        +tasks_config: str = 'config/tasks.yaml'
-        +__init__(codebase_path, docs_dir, kb_dir)
-        +project_manager_agent()
-        +codebase_analyst_agent()
-        +documentation_agent()
-        +domain_expert_agent()
-        +migration_agent()
-        +crew()
-    }
-    DocumentationCrew <|-- CrewBase
-    DocumentationCrew ..> Agent
-    DocumentationCrew ..> Task
+  class DocumentationCrew {
+    +agents_config: str = 'config/agents.yaml'
+    +tasks_config: str = 'config/tasks.yaml'
+    +__init__(codebase_path, doc_path, kb_path)
+    +project_manager_agent()
+    +codebase_analyst_agent()
+    +documentation_agent()
+    +domain_expert_agent()
+    +migration_agent()
+    +crew()
+  }
+  DocumentationCrew <|-- CrewBase
+  DocumentationCrew ..> Agent
+  DocumentationCrew ..> Task
 ```
 
-* **Agents Config**: `config/agents.yaml` defines roles, goals, and backstories for each agent.
-* **Tasks Config**: `config/tasks.yaml` lists tasks, descriptions, expected outputs, and agent assignments.
-* **Agent Methods**: Decorated with `@agent`, these factory methods instantiate `Agent` objects, binding each agent to its portion of the workflow and injecting the specific tools they need.
-* **Task Methods**: Decorated with `@task`, these methods wrap each entry in `tasks.yaml` into a `Task` with a designated output file.
-* **Crew Graph**: The `@crew` method collects all agents (except the manager), applies a **hierarchical** execution process, and sets the `project_manager_agent` as the orchestrator.
+* **Constructor**:
 
----
+  * Initializes `codebase_path`, `doc_path`, `kb_path`.
+  * Sets up cached tools:
 
-### 3. Agents & Tools
+    * `DirectoryReadTool` & `FileReadTool` for both code and KB.
 
-Agents are bound to different phases of the pipeline and have distinct responsibilities:
+### 3 Agents, Tasks, and Crew
+See [Documentation Crew document](https://github.com/gsantopaolo/reforge-ai/blob/main/docs/documentation_crew.md)
 
-| Agent                        | Role Summary                                            | Tools Injected                                                                            |
-| ---------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **project\_manager\_agent**  | Strategic orchestrator; enforces standards and sprints. | (No direct tools, delegates to other agents.)                                             |
-| **codebase\_analyst\_agent** | Static analysis; dependency mapping and indexing.       | `DependencyMapperTool`, `JDepsTool`, `SerperDevTool`, `DirectoryReadTool`, `FileReadTool` |
-| **documentation\_agent**     | Converts code insights into docs and diagrams.          | `CodeParserTool`, `DirectoryReadTool`, `FileReadTool`                                     |
-| **domain\_expert\_agent**    | Validates compliance against business rules.            | `SerperDevTool` (for web research)                                                        |
-| **migration\_agent**         | Builds phased migration blueprints.                     | `SerperDevTool`, `DirectoryReadTool`, `FileReadTool`                                      |
 
----
-
-### 4. Task Workflow
-
-The pipeline consists of the following tasks, executed in a hierarchical sequence:
+### 4. Task Workflow Diagram
 
 ```mermaid
-flowchart TD
-    EFMD(Extract File Metadata) --> GSA(Generate System Architecture)
-    GSA --> GMD(Generate Module Docs)
-    GMD --> CTI(Component & Tech Inventory)
-    CTI --> RMB(Research Migration Best Practices)
-    RMB --> IA(Java21 Impact Analysis)
-    IA --> PME(Plan Phased Module Extraction)
-    PME --> PMR(Plan Migration Roadmap)
-    PMR --> FHS(Final Handover & Summary)
+flowchart LR
+  EFMD[Extract File Metadata] --> GSA[Generate System Architecture]
+  GSA --> GMD[Generate Module Docs]
+  GMD --> CTI[Component & Tech Inventory]
+  CTI --> RMB[Research Migration Best Practices]
+  RMB --> IA[Java21 Impact Analysis]
+  IA --> PME[Plan Phased Module Extraction]
+  PME --> PMR[Plan Migration Roadmap]
+  PMR --> FHS[Final Handover & Summary]
 ```
-
-* **extract\_file\_metadata** (`codebase_analyst_agent`): Parses Java files, builds a file metadata index (`1-Metadata.md`).
-* **generate\_system\_architecture** (`documentation_agent`): Produces high-level architecture diagrams (`2-SystemArchitecture.md`).
-* **generate\_module\_docs** (`documentation_agent`): Auto-generates Javadoc enhancements, class & sequence diagrams (`3-ModuleDocumentation.md`).
-* **component\_technology\_inventory** (`codebase_analyst_agent`): Enumerates libraries and frameworks, researches Java21 migration notes.
-* **research\_migration\_best\_practices** (`domain_expert_agent`): Summarizes web-sourced migration patterns and case studies.
-* **impact\_analysis\_on\_java21** (`migration_agent`): Maps legacy constructs to Java21/Spring Boot equivalents, assesses risks.
-* **plan\_phased\_module\_extraction** (`migration_agent`, **human\_input**): Builds a detailed phased extraction plan with YAML outline.
-* **plan\_migration\_roadmap** (`migration_agent`, **human\_input**): Aggregates all docs into a time-phased refactoring roadmap.
-* **final\_handover\_and\_summary** (`migration_agent`): Produces executive report and optional slide deck.
 
 ---
 
@@ -121,13 +102,17 @@ sequenceDiagram
     participant DE as domain_expert_agent
     participant MA as migration_agent
 
-    CLI->>DC: instantiate and crew()
-    DC->>PM: kickoff(initial_params)
+    CLI->>DC: crew()
+    DC->>PM: kickoff(params)
     PM->>CA: extract_file_metadata()
-    CA->>DA: generate_system_architecture(), generate_module_docs()
-    DA->>DE: research_migration_best_practices()
+    CA->>DA: generate_system_architecture()
+    DA->>DA: generate_module_docs()
+    DA->>CA: component_technology_inventory()
+    CA->>DE: research_migration_best_practices()
     DE->>MA: impact_analysis_on_java21()
-    MA->>MA: plan_phased_module_extraction(), plan_migration_roadmap(), final_handover_and_summary()
+    MA->>MA: plan_phased_module_extraction()
+    MA->>MA: plan_migration_roadmap()
+    MA->>MA: final_handover_and_summary()
     MA->>CLI: return state model
 ```
 
@@ -135,8 +120,6 @@ sequenceDiagram
 
 ### 6. Outputs
 
-* **Documentation Files**: Under `1-documentation/docs`, one Markdown per task.
-* **Pipeline State**: JSON snapshot in `1-documentation/state/documentation_state.json`.
-* **Knowledge Base**: Raw artifacts under `kb-docs` for intermediate reference.
-
-
+* **Markdown Artifacts**: Individual task docs in `1-documentation/docs/`.
+* **Pipeline State**: JSON at `1-documentation/state/documentation_state.json`.
+* **Knowledge Base**: Intermediate logs & artifacts in `kb-docs/`.
