@@ -1,12 +1,3 @@
-# Code Generation Improvement Suggestions
-
-## measuring results
-
-## Playwright 
-
-## Test Gemini 2.5 pro (auth not available via api?)
-
-## Test Claude 3.7 (rate limit)
 
 # Documentation Generation Improvement Suggestions
 
@@ -18,13 +9,6 @@
   * Enable parallel processing for independent documentation tasks (e.g., module documentation, component inventories).
   * Implement task orchestration tools or job schedulers for better parallel execution.
 
-## 2. Incremental Documentation
-
-* **Issue:** Current system regenerates all documentation on every update, which is inefficient.
-* **Proposed Improvements:**
-
-  * Add support for incremental documentation updates.
-  * Implement document diffing tools to clearly highlight changes and updates.
 
 ## 3. Enhanced Visualization
 
@@ -42,8 +26,8 @@
   * Implement hierarchical context chunking to manage large applications more effectively.
   * Add document vectorization coupled with Retrieval-Augmented Generation (RAG) to support larger and richer context windows.
 
-## 5. Feedback Loop Integration
-
+## 5. human feedback Loop Integration
+feedback for each document, even a pipeline for each document that knows about the already generated documents
 * **Issue:** Lack of systematic mechanisms to incorporate developer feedback.
 * **Proposed Improvements:**
 
