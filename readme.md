@@ -14,7 +14,7 @@ ReforgeAI is an agentic AI system designed to modernize legacy Java codebases. I
 * [Human-in-the-Loop Feedback](#-human-in-the-loop-feedback)
 * [Known Issues & Troubleshooting](#-known-issues--troubleshooting)
 * [Next Steps](#-next-steps)
-* [License](#-license)
+* [References](#-references)
 
 ---
 
