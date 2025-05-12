@@ -149,18 +149,43 @@ For the complete list of improvements/next steps, read:
 ---
 
 ## 📚 References
-- [MongoDB Launches New Program for Enterprises to Build Modern Applications with Advanced Generative AI Capabilities](https://www.mongodb.com/press/mongodb-launches-new-program-for-enterprises-to-build-modern-applications-with-advanced-generative-ai-capabilities) :contentReference[oaicite:0]{index=0}
-- [Leveraging Large Language Models for Automated Code Migration and Repository-Level Tasks — Part II: Supplement — Specialized Language Models for Code](https://medium.com/@jelkhoury880/leveraging-large-language-models-for-automated-code-migration-and-repository-level-tasks-part-ii-24d23c3cc7a0) :contentReference[oaicite:1]{index=1}
-- [Upgrading Java versions with Amazon Q Developer](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-transformation.html) :contentReference[oaicite:2]{index=2}
-- [Generative AI in application modernization](https://www.ibm.com/think/topics/generative-ai-for-application-modernization) :contentReference[oaicite:3]{index=3}
-- [Generative AI: A Transformative Force in Legacy App Modernization](https://www.nttdata.com/global/en/insights/focus/2025/generative-ai-a-transformative-force-in-legacy-app-modernization) :contentReference[oaicite:4]{index=4}
-- [The Unreasonable Effectiveness of Generative AI in Legacy Application Modernization](https://medium.com/@adnanmasood/the-unreasonable-effectiveness-of-generative-ai-in-legacy-application-modernization-0e81d294f894) :contentReference[oaicite:5]{index=5}
-- [Application Modernization | MongoDB](https://www.mongodb.com/resources/solutions/use-cases/application-modernization) :contentReference[oaicite:6]{index=6}
+- [MongoDB Launches New Program for Enterprises to Build Modern Applications with Advanced Generative AI Capabilities](https://www.mongodb.com/press/mongodb-launches-new-program-for-enterprises-to-build-modern-applications-with-advanced-generative-ai-capabilities) 
+- [Leveraging Large Language Models for Automated Code Migration and Repository-Level Tasks — Part II: Supplement — Specialized Language Models for Code](https://medium.com/@jelkhoury880/leveraging-large-language-models-for-automated-code-migration-and-repository-level-tasks-part-ii-24d23c3cc7a0) 
+- [Upgrading Java versions with Amazon Q Developer](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-transformation.html) 
+- [Generative AI in application modernization](https://www.ibm.com/think/topics/generative-ai-for-application-modernization) 
+- [Generative AI: A Transformative Force in Legacy App Modernization](https://www.nttdata.com/global/en/insights/focus/2025/generative-ai-a-transformative-force-in-legacy-app-modernization) 
+- [The Unreasonable Effectiveness of Generative AI in Legacy Application Modernization](https://medium.com/@adnanmasood/the-unreasonable-effectiveness-of-generative-ai-in-legacy-application-modernization-0e81d294f894) 
+- [Application Modernization | MongoDB](https://www.mongodb.com/resources/solutions/use-cases/application-modernization) 
 - [Why General-Purpose LLMs Won’t Modernize Your Codebase — And What Will](https://medium.com/@jelkhoury880/why-general-purpose-llms-wont-modernize-your-codebase-and-what-will-eaf768481d38)
 - [Modernizing Legacy Java Applications — Best Practices and Considerations](https://medium.com/@AlexanderObregon/modernizing-legacy-java-applications-best-practices-and-considerations-a01b3b52ee7a)
 - [janus-llm/janus-llm: Leveraging LLMs for modernization through intelligent chunking, iterative prompting and reflection, and retrieval augmented generation (RAG)](https://github.com/janus-llm/janus-llm)
 - [spring-projects-experimental/spring-boot-migrator: Spring Boot Migrator (SBM) is a tool for automated code migrations to upgrade or migrate to Spring Boot](https://github.com/spring-projects-experimental/spring-boot-migrator)
 - [This Year in Uber's AI-Driven Developer Productivity Revolution](https://www.youtube.com/watch?v=jp-fBw07r7c)  
+- [facebookresearch/CodeGen: Reference implementation of code generation projects from Facebook AI Research](https://github.com/facebookresearch/CodeGen)
+- [facebookresearch/TransCoder: Public release of the TransCoder research project](https://github.com/facebookresearch/TransCoder)
+- [Legacy Modernization meets GenAI](https://martinfowler.com/articles/legacy-modernization-gen-ai.html)
+- [The Unreasonable Effectiveness of Generative AI in Legacy Application Modernization](https://medium.com/@adnanmasood/the-unreasonable-effectiveness-of-generative-ai-in-legacy-application-modernization-0e81d294f894)
+- [Accelerate Legacy App Modernization with Virtusa and AWS Generative AI](https://aws.amazon.com/blogs/apn/accelerate-legacy-app-modernization-with-virtusa-and-aws-generative-ai/)
+- [Generative AI: A Transformative Force in Legacy App Modernization](https://www.nttdata.com/global/en/insights/focus/2025/generative-ai-a-transformative-force-in-legacy-app-modernization)
+- [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
+- [Leveraging LLMs for Legacy Code Modernization: Challenges and Opportunities for LLM-Generated Documentation](https://arxiv.org/abs/2411.14971)
+- [LLMs: Understanding Code Syntax and Semantics for Code Analysis](https://arxiv.org/abs/2305.12138)
+- [Towards Understanding What Code Language Models Learned](https://arxiv.org/abs/2306.11943)
+- [Code Transformation with Amazon Q](https://dev.to/aws-heroes/code-transformation-with-amazon-q-40df)
+- [Leveraging Large Language Models for Automated Code Generation, Testing, and Debugging in Modern Development Pipelines](https://www.researchgate.net/publication/390620560_Leveraging_Large_Language_Models_for_Automated_Code_Generation_Testing_and_Debugging_in_Modern_Development_Pipelines)
+- [CodePlan: Repository-level Coding using LLMs and Planning](https://arxiv.org/abs/2309.12499)
+- [Leveraging Large Language Models for Code Translation and Software Development in Scientific Computing](https://arxiv.org/abs/2410.24119)
+- [janus-llm/janus-llm: Leveraging LLMs for modernization through intelligent chunking, iterative prompting and reflection, and retrieval augmented generation (RAG)](https://github.com/janus-llm/janus-llm?tab=readme-ov-file)
+- [Leveraging LLMs for Legacy Code Modernization: Challenges and Opportunities for LLM-Generated Documentation](https://arxiv.org/html/2411.14971v1#bib.bib6)
+- [GPT-Migrate: Convert your Codebase to any language/framework](https://medium.com/@fareedkhandev/gpt-migrate-convert-your-codebase-to-any-language-framework-cc1f846e4630)
+- [joshpxyne/gpt-migrate: Easily migrate your codebase from one framework or language to another](https://github.com/joshpxyne/gpt-migrate)
+- [aws-samples/rearchitecting-modernapps-sample: Sample Application for "Re-Architecting for Containerized Modern Application Workshop"](https://github.com/aws-samples/rearchitecting-modernapps-sample/tree/main)
+- [Stanford Webinar - Agentic AI: A Progression of Language Model Usage](https://www.youtube.com/watch?v=kJLiOGle3Lw)
+- [Amazon Q – Generative AI Assistant](https://aws.amazon.com/q/)
+- [konveyor/kai: Konveyor AI - static code analysis driven migration to new targets via Generative AI](https://github.com/konveyor/kai)
+- [IBM/watsonx-code-assistant: IBM watsonx Code Assistant simplifies and accelerates coding workflows across Python, Java, C, C++, Go, JavaScript, Typescript, and more](https://github.com/IBM/watsonx-code-assistant)
+- [AgiFlow/repo-upgrade: Dependencies Upgrade with multi-agents (CrewAI & Langgraph)](https://github.com/AgiFlow/repo-upgrade)
+- [AGIFlow - Cheaper, Faster AI Application](https://agiflow.io/)
 
 
 ---
