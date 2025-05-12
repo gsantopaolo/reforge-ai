@@ -1,0 +1,20 @@
+<!-- src/main/resources/templates/index.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Members</title>
+</head>
+<body>
+<form th:action="@{/register}" th:object="${member}" method="post">
+    Name: <input th:field="*{name}" /><br/>
+    Email: <input th:field="*{email}" /><br/>
+    <button type="submit">Register</button>
+</form>
+<hr/>
+<ul>
+    <li th:each="m : ${members}">
+        <span th:text="${m.name}"></span> — <span th:text="${m.email}"></span>
+    </li>
+</ul>
+</body>
+</html>

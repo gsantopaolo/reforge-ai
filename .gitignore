@@ -54,3 +54,5 @@ test/MNIST
 /src/1-documentation-13
 /src/1-documentation-14
 /src/1-documentation-15
+**/target/
+**/.idea/
