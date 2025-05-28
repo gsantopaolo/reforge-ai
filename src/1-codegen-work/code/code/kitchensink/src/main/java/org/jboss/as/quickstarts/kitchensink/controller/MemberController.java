@@ -24,13 +24,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.jboss.as.quickstarts.kitchensink.model.Member;
-import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import com.example.kitchensink.business.model.Member;
+import com.example.kitchensink.business.service.MemberRegistration;
 
-// The @Model stereotype is a convenience mechanism to make this a request-scoped bean that has an
-// EL name
-// Read more about the @Model stereotype in this FAQ:
-// http://www.cdi-spec.org/faq/#accordion6
 @Model
 public class MemberController {
 
@@ -66,19 +62,13 @@ public class MemberController {
         // Default to general error message that registration failed.
         String errorMessage = "Registration failed. See server log for more information";
         if (e == null) {
-            // This shouldn't happen, but return the default messages
             return errorMessage;
         }
-
-        // Start with the exception and recurse to find the root cause
         Throwable t = e;
         while (t != null) {
-            // Get the message from the Throwable class instance
             errorMessage = t.getLocalizedMessage();
             t = t.getCause();
         }
-        // This is the root cause message
         return errorMessage;
     }
-
 }

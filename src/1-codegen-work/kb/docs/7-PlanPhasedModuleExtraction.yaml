@@ -98,7 +98,7 @@ steps:
           - Reiterate 12 until you don't get any error.
           - It is essential that your code build correctly before finishing the task. 
           - If needed as for help to the Team Lead Agent and to the Software Architect Agent.
-    status: "current phase"
+    status: "curren phase"
     notes: "This step focuses on creating a modern, Spring-based business core."
 
   - id: "phase3_convert_ui_and_api_to_springboot"

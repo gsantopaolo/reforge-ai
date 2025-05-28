@@ -13,8 +13,8 @@
     <!-- Build the shared util first -->
     <module>kitchensink-util</module>
 
-    <!-- Then build the business JAR -->
     <module>kitchensink-business</module>
+
 
     <!-- Finally build the legacy WAR that depends on both -->
     <module>kitchensink</module>

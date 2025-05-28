@@ -17,7 +17,6 @@
 package org.jboss.as.quickstarts.kitchensink.rest;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,9 +39,9 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
-import org.jboss.as.quickstarts.kitchensink.model.Member;
-import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
+import com.example.kitchensink.business.data.MemberRepository;
+import com.example.kitchensink.business.model.Member;
+import com.example.kitchensink.business.service.MemberRegistration;
 
 /**
  * JAX-RS Example
@@ -63,7 +62,7 @@ public class MemberResourceRESTService {
     private MemberRepository repository;
 
     @Inject
-    MemberRegistration registration;
+    private MemberRegistration registration;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -119,44 +118,14 @@ public class MemberResourceRESTService {
         return builder.build();
     }
 
-    /**
-     * <p>
-     * Validates the given Member variable and throws validation exceptions based on the type of error. If the error is standard
-     * bean validation errors then it will throw a ConstraintValidationException with the set of the constraints violated.
-     * </p>
-     * <p>
-     * If the error is caused because an existing member with the same email is registered it throws a regular validation
-     * exception so that it can be interpreted separately.
-     * </p>
-     *
-     * @param member Member to be validated
-     * @throws ConstraintViolationException If Bean Validation errors exist
-     * @throws ValidationException If member with the same email already exists
-     */
     private void validateMember(Member member) throws ConstraintViolationException, ValidationException {
-        // Create a bean validator and check for issues.
         Set<ConstraintViolation<Member>> violations = validator.validate(member);
-
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(new HashSet<>(violations));
         }
-
-        // Check the uniqueness of the email address
-        if (emailAlreadyExists(member.getEmail())) {
-            throw new ValidationException("Unique Email Violation");
-        }
     }
 
-    /**
-     * Creates a JAX-RS "Bad Request" response including a map of all violation fields, and their message. This can then be used
-     * by clients to show violations.
-     *
-     * @param violations A set of violations that needs to be reported
-     * @return JAX-RS response containing all violations
-     */
-    private Response.ResponseBuilder createViolationResponse(Set<ConstraintViolation<?>> violations) {
-        log.fine("Validation completed. violations found: " + violations.size());
-
+    private Response.ResponseBuilder createViolationResponse(Set<? extends ConstraintViolation<?>> violations) {
         Map<String, String> responseObj = new HashMap<>();
 
         for (ConstraintViolation<?> violation : violations) {
@@ -164,22 +133,5 @@ public class MemberResourceRESTService {
         }
 
         return Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
-    }
-
-    /**
-     * Checks if a member with the same email address is already registered. This is the only way to easily capture the
-     * "@UniqueConstraint(columnNames = "email")" constraint from the Member class.
-     *
-     * @param email The email to check
-     * @return True if the email already exists, and false otherwise
-     */
-    public boolean emailAlreadyExists(String email) {
-        Member member = null;
-        try {
-            member = repository.findByEmail(email);
-        } catch (NoResultException e) {
-            // ignore
-        }
-        return member != null;
     }
 }

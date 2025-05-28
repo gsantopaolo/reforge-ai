@@ -28,10 +28,11 @@ from tools.langchain_shell_tool import LangChainShellWrapper
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
 
 # Default model names per provider (override via MODEL_NAME if needed)
+# must change .ENV AS WELL!!!
 _default_models = {
-    # "openai": "gpt-4.1-mini",
-    # "openai": "gpt-4.1-2025-04-14",
-    "openai": "o3-2025-04-16",
+    # "openai": "openai/gpt-4.1-mini",
+    "openai": "openai/gpt-4.1-2025-04-14",
+    # "openai": "openai/o3-2025-04-16",
     "anthropic": "anthropic/claude-3-7-sonnet-20250219",
     # "anthropic": "claude-3-5-sonnet-latest",
     "gemini": "gemini/gemini-2.5-pro-exp-03-25"
@@ -121,7 +122,7 @@ class GenModernCrew:
         return Agent(
             config=cfg,
             tools=tools,
-            llm=self.llm,
+            # llm=self.llm,
             verbose=True,
             allow_delegation=False,
             max_iter=cfg.get('max_iter', 25)

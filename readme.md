@@ -74,8 +74,9 @@ To compile and run both the legacy (`gen_docs.py`) and modern (`gen_modern.py`) 
 
 1. **Generate Documentation & Plan**
 
+from the src folder:
    ```bash
-   python3 gen_docs.py <path_to_legacy_codebase>
+   python3 gen_docs.py temp_codebase/kitchensink/
    ```
 2. **Execute Modernization**
 

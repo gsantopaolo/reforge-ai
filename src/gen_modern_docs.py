@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import json
@@ -8,6 +9,15 @@ langtrace.init(api_key=os.getenv("LANGTRACE_API_KEY"))
 
 from sympy.codegen.ast import Raise
 from crews.gen_modern.gen_modern_docs_crew import GenModernCrew
+
+# Configure root logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    force = True
+)
+logger = logging.getLogger(__name__)
 
 # Hardcoded paths
 codebase_path = "/Users/gp/Developer/java-samples/reforge-ai/src/1-codegen-work/code/code"

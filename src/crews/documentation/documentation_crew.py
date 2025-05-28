@@ -20,6 +20,7 @@ from typing import Any
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
 
 # Default model names per provider (override via MODEL_NAME if needed)
+# must change .ENV AS WELL!!!
 _default_models = {
     "openai": "gpt-4.1-mini",
     "anthropic": "anthropic/claude-3-7-sonnet-20250219",
